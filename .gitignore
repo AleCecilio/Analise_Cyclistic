@@ -11,3 +11,6 @@ __pycache__/
 # Raw data
 data/raw/
 data/raw_zip/
+
+# Processed data
+data/processed/
