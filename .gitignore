@@ -1,0 +1,13 @@
+# Virtual environment
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Raw data
+data/raw/
+data/raw_zip/
