@@ -29,7 +29,7 @@ A análise busca transformar os dados brutos em informações que possam contrib
 
 Os dados utilizados neste projeto são provenientes do conjunto **Divvy Trip Data**, disponibilizado publicamente pela **Divvy**, sistema de compartilhamento de bicicletas de Chicago, Illinois, EUA.
 
-Os dados são disponibilizados em arquivos mensais no formato CSV, normalmente compactados em arquivos ZIP.
+Os dados são disponibilizados mensalmente em arquivos CSV, compactados em arquivos ZIP.
 
 ### Período Analisado
 
@@ -37,7 +37,7 @@ Foram utilizados os **12 meses mais recentes disponíveis**, abrangendo o perío
 
 **Setembro de 2025 a agosto de 2026.**
 
-Os arquivos utilizados são:
+Os arquivos CSV utilizados são:
 
 ```text
 202509-divvy-tripdata.csv
@@ -52,6 +52,23 @@ Os arquivos utilizados são:
 202606-divvy-tripdata.csv
 202607-divvy-tripdata.csv
 202608-divvy-tripdata.csv
+```
+
+Os respectivos arquivos ZIP originais são:
+
+```text
+202509-divvy-tripdata.zip
+202510-divvy-tripdata.zip
+202511-divvy-tripdata.zip
+202512-divvy-tripdata.zip
+202601-divvy-tripdata.zip
+202602-divvy-tripdata.zip
+202603-divvy-tripdata.zip
+202604-divvy-tripdata.zip
+202605-divvy-tripdata.zip
+202606-divvy-tripdata.zip
+202607-divvy-tripdata.zip
+202608-divvy-tripdata.zip
 ```
 
 ### Convenção dos Nomes dos Arquivos
@@ -97,33 +114,37 @@ Portanto:
 
 202601 → janeiro de 2026
 202602 → fevereiro de 2026
-...
+202603 → março de 2026
+202604 → abril de 2026
+202605 → maio de 2026
+202606 → junho de 2026
+202607 → julho de 2026
 202608 → agosto de 2026
 ```
 
-Dessa forma, o arquivo `202509-divvy-tripdata.csv` representa os dados de viagens da Divvy referentes a **setembro de 2025**, enquanto `202608-divvy-tripdata.csv` representa os dados referentes a **agosto de 2026**.
+Dessa forma, `202509-divvy-tripdata.csv` representa os dados de viagens da Divvy referentes a **setembro de 2025**, enquanto `202608-divvy-tripdata.csv` representa os dados referentes a **agosto de 2026**.
 
 Após o carregamento dos arquivos mensais, os datasets são combinados utilizando **Python e Pandas**.
 
 O conjunto consolidado é salvo como:
 
 ```text
-cyclistic_2025_2026.csv
+cyclistic_202509_202608.csv
 ```
 
 O nome representa:
 
 ```text
 cyclistic
-   ↓
+    ↓
 Projeto baseado no estudo de caso da Cyclistic
 
-2025_2026
-   ↓
-Período abrangido pelos dados utilizados
+202509_202608
+    ↓
+Período exato dos dados consolidados
 ```
 
-Embora o período exato seja de setembro de 2025 a agosto de 2026, o nome `cyclistic_2025_2026.csv` identifica de forma simples o intervalo de anos presente no conjunto consolidado.
+Assim, o nome do arquivo indica precisamente que o conjunto contém dados de **setembro de 2025 (`202509`) a agosto de 2026 (`202608`)**.
 
 ### Variáveis Disponíveis
 
@@ -143,24 +164,41 @@ Os arquivos contêm informações sobre as viagens realizadas pelos usuários do
 * `end_lng` — longitude da estação de término;
 * `member_casual` — tipo de usuário.
 
-Os arquivos originais são mantidos na pasta `data/raw/`, enquanto os dados consolidados e processados são armazenados em `data/processed/`.
-
 ## Estrutura do Projeto
 
 ```text
 Analise_Cyclistic/
-│
-├── .venv/
-│
-├── README.md
-├── requirements.txt
-├── .gitignore
-│
 ├── data/
 │   ├── raw/
+│   │   ├── 202509-divvy-tripdata.csv
+│   │   ├── 202510-divvy-tripdata.csv
+│   │   ├── 202511-divvy-tripdata.csv
+│   │   ├── 202512-divvy-tripdata.csv
+│   │   ├── 202601-divvy-tripdata.csv
+│   │   ├── 202602-divvy-tripdata.csv
+│   │   ├── 202603-divvy-tripdata.csv
+│   │   ├── 202604-divvy-tripdata.csv
+│   │   ├── 202605-divvy-tripdata.csv
+│   │   ├── 202606-divvy-tripdata.csv
+│   │   ├── 202607-divvy-tripdata.csv
+│   │   └── 202608-divvy-tripdata.csv
+│   │
 │   ├── raw_zip/
+│   │   ├── 202509-divvy-tripdata.zip
+│   │   ├── 202510-divvy-tripdata.zip
+│   │   ├── 202511-divvy-tripdata.zip
+│   │   ├── 202512-divvy-tripdata.zip
+│   │   ├── 202601-divvy-tripdata.zip
+│   │   ├── 202602-divvy-tripdata.zip
+│   │   ├── 202603-divvy-tripdata.zip
+│   │   ├── 202604-divvy-tripdata.zip
+│   │   ├── 202605-divvy-tripdata.zip
+│   │   ├── 202606-divvy-tripdata.zip
+│   │   ├── 202607-divvy-tripdata.zip
+│   │   └── 202608-divvy-tripdata.zip
+│   │
 │   └── processed/
-│       └── cyclistic_2025_2026.csv
+│       └── cyclistic_202509_202608.csv
 │
 ├── notebooks/
 │   ├── 01_initial_exploration.ipynb
@@ -175,19 +213,26 @@ Analise_Cyclistic/
 │   ├── 04_ride_duration.sql
 │   └── 05_station_analysis.sql
 │
-└── powerbi/
-    └── cyclistic_dashboard.pbix
+├── powerbi/
+│   └── cyclistic_dashboard.pbix
+│
+├── .venv/
+├── README.md
+├── requirements.txt
+└── .gitignore
 ```
+
+> **Observação:** Os diretórios `data/raw/`, `data/raw_zip/` e `data/processed/` são mantidos localmente e não são versionados no GitHub devido ao grande volume dos arquivos. O processamento e a consolidação dos dados podem ser reproduzidos por meio dos notebooks do projeto.
 
 ### Organização das Pastas
 
 **`data/raw/`**
 
-Armazena os arquivos CSV originais, sem alterações.
+Armazena os arquivos CSV originais, sem alterações, referentes aos 12 meses analisados.
 
 **`data/raw_zip/`**
 
-Armazena os arquivos ZIP originais baixados da fonte de dados.
+Armazena os arquivos ZIP originais baixados da fonte de dados. Esses arquivos representam a versão original disponibilizada pela fonte antes da extração dos CSVs.
 
 **`data/processed/`**
 
@@ -232,8 +277,14 @@ Nesta etapa serão identificados e tratados problemas relacionados à qualidade 
 * Tipos de dados incorretos;
 * Inconsistências;
 * Valores inválidos;
+* Conversão das variáveis `started_at` e `ended_at` para `datetime`;
+* Criação de variáveis relacionadas a data e horário;
 * Cálculo da duração das viagens;
 * Criação de novas variáveis para análise.
+
+Antes do tratamento detalhado, será utilizado o **Sweetviz** como ferramenta auxiliar para uma inspeção inicial automatizada do conjunto de dados.
+
+Devido ao grande volume de registros, o relatório exploratório será gerado utilizando uma amostra dos dados. As decisões de limpeza e tratamento, entretanto, serão realizadas sobre o conjunto completo.
 
 ### 3. Análise Exploratória
 
@@ -268,6 +319,7 @@ O dashboard terá como objetivo apresentar os principais indicadores e padrões 
 * **NumPy** — operações e cálculos numéricos;
 * **Matplotlib** — visualização de dados;
 * **Seaborn** — visualização e análise exploratória;
+* **Sweetviz** — inspeção exploratória automatizada;
 * **Jupyter Notebook** — desenvolvimento e documentação das análises;
 * **SQL** — consultas e análise dos dados;
 * **DuckDB** — execução das consultas SQL;
