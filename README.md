@@ -198,7 +198,8 @@ Analise_Cyclistic/
 │   │   └── 202608-divvy-tripdata.zip
 │   │
 │   └── processed/
-│       └── cyclistic_202509_202608.csv
+│       ├── cyclistic_202509_202608.csv
+│       └── cyclistic_202509_202608_processed.csv    
 │
 ├── notebooks/
 │   ├── 01_initial_exploration.ipynb
