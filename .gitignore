@@ -14,3 +14,6 @@ data/raw_zip/
 
 # Processed data
 data/processed/
+
+# Conexão com o Banco de Dados
+.env
