@@ -203,9 +203,7 @@ Analise_Cyclistic/
 │
 ├── notebooks/
 │   ├── 01_initial_exploration.ipynb
-│   ├── 02_data_cleaning.ipynb
-│   ├── 03_exploratory_analysis.ipynb
-│   └── 04_sql_analysis.ipynb
+│   └── 02_data_cleaning.ipynb
 │
 ├── sql/
 │   ├── 01_user_profile.sql
