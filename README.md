@@ -6,11 +6,31 @@ Este projeto consiste em uma análise de dados baseada no estudo de caso da **Cy
 
 A análise utiliza dados históricos de viagens do sistema de compartilhamento de bicicletas **Divvy**, de Chicago, Illinois, EUA, com o objetivo de identificar padrões de utilização e diferenças no comportamento entre os diferentes tipos de usuários.
 
-O projeto foi desenvolvido utilizando **Python, Pandas, SQL e Power BI**, abrangendo etapas de exploração, limpeza, tratamento, análise e visualização dos dados.
+O projeto utiliza **Python, Pandas, PostgreSQL, SQL e Power BI**, abrangendo etapas de exploração, limpeza, tratamento, análise e visualização dos dados.
+
+O fluxo principal do projeto é:
+
+```text
+Dados brutos
+    ↓
+Python + Pandas
+    ↓
+Exploração e limpeza
+    ↓
+Dataset processado
+    ↓
+PostgreSQL
+    ↓
+Análise com SQL
+    ↓
+Power BI
+```
+
+---
 
 ## Objetivo
 
-O objetivo principal deste projeto é analisar o comportamento dos usuários do serviço de compartilhamento de bicicletas e identificar padrões relacionados às viagens realizadas.
+O objetivo principal deste projeto é analisar o comportamento dos usuários do serviço de compartilhamento de bicicletas e identificar diferenças nos padrões de utilização entre **members** e **casuals**.
 
 Entre os aspectos analisados estão:
 
@@ -21,23 +41,26 @@ Entre os aspectos analisados estão:
 * Distribuição das viagens ao longo do dia;
 * Comportamento ao longo dos meses;
 * Utilização das estações;
+* Tipo de bicicleta utilizada;
 * Diferenças de comportamento entre os tipos de usuários.
 
-A análise busca transformar os dados brutos em informações que possam contribuir para a compreensão do comportamento dos usuários.
+Além da análise descritiva, o projeto busca investigar a hipótese de que os diferentes tipos de usuários apresentam padrões de utilização distintos, especialmente em relação a **dias da semana, horários, duração das viagens e localização das estações**.
+
+---
 
 ## Fontes de Dados
 
-Os dados utilizados neste projeto são provenientes do conjunto **Divvy Trip Data**, disponibilizado publicamente pela **Divvy**, sistema de compartilhamento de bicicletas de Chicago, Illinois, EUA.
+Os dados utilizados neste projeto são provenientes do conjunto **Divvy Trip Data**, disponibilizado publicamente pela Divvy, sistema de compartilhamento de bicicletas de Chicago, Illinois, EUA.
 
-Os dados são disponibilizados mensalmente em arquivos CSV, compactados em arquivos ZIP.
+Os dados são disponibilizados mensalmente em arquivos CSV compactados em arquivos ZIP.
 
 ### Período Analisado
 
-Foram utilizados os **12 meses mais recentes disponíveis**, abrangendo o período de:
+Foram utilizados os **12 meses de dados selecionados para o estudo de caso**, abrangendo:
 
 **Setembro de 2025 a agosto de 2026.**
 
-Os arquivos CSV utilizados são:
+Arquivos utilizados:
 
 ```text
 202509-divvy-tripdata.csv
@@ -54,26 +77,15 @@ Os arquivos CSV utilizados são:
 202608-divvy-tripdata.csv
 ```
 
-Os respectivos arquivos ZIP originais são:
-
-```text
-202509-divvy-tripdata.zip
-202510-divvy-tripdata.zip
-202511-divvy-tripdata.zip
-202512-divvy-tripdata.zip
-202601-divvy-tripdata.zip
-202602-divvy-tripdata.zip
-202603-divvy-tripdata.zip
-202604-divvy-tripdata.zip
-202605-divvy-tripdata.zip
-202606-divvy-tripdata.zip
-202607-divvy-tripdata.zip
-202608-divvy-tripdata.zip
-```
+Os arquivos ZIP originais correspondentes foram utilizados para obtenção dos arquivos CSV.
 
 ### Convenção dos Nomes dos Arquivos
 
-Os arquivos originais seguem um padrão de nomenclatura que identifica o período e o tipo de dado.
+Os arquivos seguem o padrão:
+
+```text
+YYYYMM-divvy-tripdata.csv
+```
 
 Por exemplo:
 
@@ -81,37 +93,22 @@ Por exemplo:
 202509-divvy-tripdata.csv
 ```
 
-O nome pode ser dividido em três partes:
+representa os dados referentes a setembro de 2025.
 
-```text
-202509
-  ↓
-Ano e mês
-
-divvy
-  ↓
-Sistema Divvy
-
-tripdata
-  ↓
-Dados de viagens
-```
-
-O trecho `202509` utiliza o formato **YYYYMM**:
+O trecho `YYYYMM` corresponde a:
 
 ```text
 YYYY = ano
 MM   = mês
 ```
 
-Portanto:
+Assim:
 
 ```text
 202509 → setembro de 2025
 202510 → outubro de 2025
 202511 → novembro de 2025
 202512 → dezembro de 2025
-
 202601 → janeiro de 2026
 202602 → fevereiro de 2026
 202603 → março de 2026
@@ -122,33 +119,25 @@ Portanto:
 202608 → agosto de 2026
 ```
 
-Dessa forma, `202509-divvy-tripdata.csv` representa os dados de viagens da Divvy referentes a **setembro de 2025**, enquanto `202608-divvy-tripdata.csv` representa os dados referentes a **agosto de 2026**.
+Os arquivos mensais são combinados utilizando **Python e Pandas**.
 
-Após o carregamento dos arquivos mensais, os datasets são combinados utilizando **Python e Pandas**.
-
-O conjunto consolidado é salvo como:
+O dataset consolidado inicialmente é salvo como:
 
 ```text
 cyclistic_202509_202608.csv
 ```
 
-O nome representa:
+Após as etapas de limpeza e tratamento, o dataset processado é salvo como:
 
 ```text
-cyclistic
-    ↓
-Projeto baseado no estudo de caso da Cyclistic
-
-202509_202608
-    ↓
-Período exato dos dados consolidados
+cyclistic_202509_202608_processed.csv
 ```
 
-Assim, o nome do arquivo indica precisamente que o conjunto contém dados de **setembro de 2025 (`202509`) a agosto de 2026 (`202608`)**.
+---
 
-### Variáveis Disponíveis
+## Variáveis dos Dados
 
-Os arquivos contêm informações sobre as viagens realizadas pelos usuários do sistema, incluindo:
+Os arquivos originais contêm informações sobre as viagens realizadas pelos usuários, incluindo:
 
 * `ride_id` — identificador da viagem;
 * `rideable_type` — tipo de bicicleta utilizada;
@@ -164,10 +153,20 @@ Os arquivos contêm informações sobre as viagens realizadas pelos usuários do
 * `end_lng` — longitude da estação de término;
 * `member_casual` — tipo de usuário.
 
+Durante o processo de tratamento, também foram criadas variáveis derivadas:
+
+* `ride_length` — duração da viagem em minutos;
+* `day_of_week` — número correspondente ao dia da semana;
+* `day_of_week_name` — nome do dia da semana;
+* `hour` — hora de início da viagem.
+
+---
+
 ## Estrutura do Projeto
 
 ```text
 Analise_Cyclistic/
+
 ├── data/
 │   ├── raw/
 │   │   ├── 202509-divvy-tripdata.csv
@@ -184,22 +183,11 @@ Analise_Cyclistic/
 │   │   └── 202608-divvy-tripdata.csv
 │   │
 │   ├── raw_zip/
-│   │   ├── 202509-divvy-tripdata.zip
-│   │   ├── 202510-divvy-tripdata.zip
-│   │   ├── 202511-divvy-tripdata.zip
-│   │   ├── 202512-divvy-tripdata.zip
-│   │   ├── 202601-divvy-tripdata.zip
-│   │   ├── 202602-divvy-tripdata.zip
-│   │   ├── 202603-divvy-tripdata.zip
-│   │   ├── 202604-divvy-tripdata.zip
-│   │   ├── 202605-divvy-tripdata.zip
-│   │   ├── 202606-divvy-tripdata.zip
-│   │   ├── 202607-divvy-tripdata.zip
-│   │   └── 202608-divvy-tripdata.zip
+│   │   └── arquivos ZIP originais
 │   │
 │   └── processed/
 │       ├── cyclistic_202509_202608.csv
-│       └── cyclistic_202509_202608_processed.csv    
+│       └── cyclistic_202509_202608_processed.csv
 │
 ├── notebooks/
 │   ├── 01_initial_exploration.ipynb
@@ -216,118 +204,316 @@ Analise_Cyclistic/
 │   └── cyclistic_dashboard.pbix
 │
 ├── .venv/
+├── .env
 ├── README.md
 ├── requirements.txt
 └── .gitignore
 ```
 
-> **Observação:** Os diretórios `data/raw/`, `data/raw_zip/` e `data/processed/` são mantidos localmente e não são versionados no GitHub devido ao grande volume dos arquivos. O processamento e a consolidação dos dados podem ser reproduzidos por meio dos notebooks do projeto.
+> **Observação:** os diretórios `data/raw/`, `data/raw_zip/` e `data/processed/` são mantidos localmente e não são versionados no GitHub devido ao grande volume dos arquivos. O arquivo `.env` também não é versionado por conter as credenciais de acesso ao banco de dados.
 
-### Organização das Pastas
+---
 
-**`data/raw/`**
+## Organização das Pastas
 
-Armazena os arquivos CSV originais, sem alterações, referentes aos 12 meses analisados.
+### `data/raw/`
 
-**`data/raw_zip/`**
+Armazena os arquivos CSV originais, sem alterações, referentes aos meses analisados.
 
-Armazena os arquivos ZIP originais baixados da fonte de dados. Esses arquivos representam a versão original disponibilizada pela fonte antes da extração dos CSVs.
+### `data/raw_zip/`
 
-**`data/processed/`**
+Armazena os arquivos ZIP originais disponibilizados pela fonte dos dados.
 
-Armazena os dados consolidados e processados utilizados nas etapas seguintes da análise.
+### `data/processed/`
 
-**`notebooks/`**
+Armazena os datasets consolidados e processados utilizados nas etapas posteriores da análise.
 
-Contém os notebooks utilizados durante as diferentes etapas do projeto:
+### `notebooks/`
 
-* `01_initial_exploration.ipynb` — exploração inicial e compreensão da estrutura dos dados;
-* `02_data_cleaning.ipynb` — limpeza, tratamento e preparação dos dados;
-* `03_exploratory_analysis.ipynb` — análise exploratória e identificação de padrões;
-* `04_sql_analysis.ipynb` — análises utilizando SQL.
+Contém os notebooks utilizados para exploração e preparação dos dados.
 
-**`sql/`**
+#### `01_initial_exploration.ipynb`
 
-Contém as consultas SQL utilizadas no projeto, organizadas de acordo com os diferentes temas analisados.
+Responsável pela exploração inicial dos arquivos mensais, incluindo:
 
-**`powerbi/`**
+* carregamento dos datasets;
+* comparação entre os arquivos;
+* análise da estrutura;
+* identificação das variáveis;
+* análise dos tipos de dados;
+* inspeção inicial da qualidade dos dados;
+* consolidação dos arquivos mensais.
 
-Contém o dashboard desenvolvido no Power BI para apresentação dos resultados.
+#### `02_data_cleaning.ipynb`
+
+Responsável pelo processo de limpeza e preparação do dataset consolidado.
+
+As principais etapas realizadas incluem:
+
+* tratamento de valores ausentes;
+* identificação e tratamento de registros duplicados;
+* conversão e padronização de datas;
+* verificação de inconsistências;
+* tratamento de registros com duração inválida;
+* criação de variáveis derivadas;
+* análise de valores atípicos;
+* validação do dataset após o tratamento;
+* geração do dataset processado;
+* preparação dos dados para carregamento no PostgreSQL.
+
+### `sql/`
+
+Contém as consultas SQL utilizadas na etapa de análise.
+
+As consultas estão separadas por tema:
+
+* `01_user_profile.sql` — perfil e comportamento geral dos usuários;
+* `02_weekly_usage.sql` — utilização ao longo da semana;
+* `03_hourly_usage.sql` — utilização ao longo das horas do dia;
+* `04_ride_duration.sql` — análise da duração das viagens;
+* `05_station_analysis.sql` — análise das estações e padrões de utilização por localização.
+
+As consultas são executadas sobre a tabela `trips` armazenada no PostgreSQL.
+
+### `powerbi/`
+
+Contém o dashboard desenvolvido no Power BI para apresentação dos principais resultados da análise.
+
+### `.env`
+
+Arquivo utilizado para armazenar localmente as configurações de conexão com o PostgreSQL, como usuário, senha, porta e nome do banco de dados.
+
+Esse arquivo não é versionado no GitHub.
+
+---
 
 ## Etapas da Análise
 
 ### 1. Exploração Inicial
 
-Nesta etapa será realizada a análise inicial dos datasets, incluindo:
+A primeira etapa consiste na compreensão dos datasets disponibilizados pela Divvy.
 
-* Carregamento dos arquivos mensais;
-* Verificação da estrutura dos dados;
-* Identificação das variáveis;
-* Verificação dos tipos de dados;
-* Comparação entre os arquivos mensais;
-* Consolidação dos datasets.
+Foram realizadas atividades como:
 
-### 2. Limpeza e Tratamento
+* carregamento dos arquivos mensais;
+* comparação da estrutura dos datasets;
+* identificação das variáveis;
+* verificação dos tipos de dados;
+* análise da quantidade de registros;
+* identificação inicial de valores ausentes;
+* consolidação dos arquivos mensais.
 
-Nesta etapa serão identificados e tratados problemas relacionados à qualidade dos dados, incluindo:
+O **Sweetviz** foi utilizado como ferramenta auxiliar para inspeção exploratória automatizada.
 
-* Valores ausentes;
-* Registros duplicados;
-* Tipos de dados incorretos;
-* Inconsistências;
-* Valores inválidos;
-* Conversão das variáveis `started_at` e `ended_at` para `datetime`;
-* Criação de variáveis relacionadas a data e horário;
-* Cálculo da duração das viagens;
-* Criação de novas variáveis para análise.
+Devido ao grande volume de registros, a geração do relatório exploratório utiliza uma amostra dos dados. As decisões de tratamento, entretanto, são realizadas considerando o dataset completo.
 
-Antes do tratamento detalhado, será utilizado o **Sweetviz** como ferramenta auxiliar para uma inspeção inicial automatizada do conjunto de dados.
+---
 
-Devido ao grande volume de registros, o relatório exploratório será gerado utilizando uma amostra dos dados. As decisões de limpeza e tratamento, entretanto, serão realizadas sobre o conjunto completo.
+### 2. Limpeza e Tratamento dos Dados
 
-### 3. Análise Exploratória
+Após a exploração inicial, foi realizado o processo de preparação dos dados.
 
-Após o tratamento dos dados, serão realizadas análises para identificar padrões de comportamento dos usuários.
+Entre os procedimentos realizados estão:
 
-Serão exploradas variáveis relacionadas a:
+* tratamento de valores ausentes;
+* identificação e tratamento de registros duplicados;
+* conversão das variáveis temporais;
+* padronização dos dados;
+* verificação de inconsistências;
+* criação da duração das viagens;
+* criação de variáveis temporais;
+* análise de valores atípicos;
+* validação do dataset final.
 
-* Perfil do usuário;
-* Duração das viagens;
-* Horários;
-* Dias da semana;
-* Meses;
-* Estações;
-* Tipo de bicicleta.
+#### Tratamento de inconsistências temporais
+
+Foram identificados registros em que `ended_at` apresentava um horário anterior a `started_at`.
+
+Os registros encontrados estavam concentrados em **2 de novembro de 2025**, durante a transição do horário de verão em Chicago.
+
+A ocorrência foi considerada no cálculo de `ride_length`, evitando que essas viagens fossem interpretadas como tendo duração negativa.
+
+#### Tratamento da duração das viagens
+
+A variável `ride_length` foi utilizada para identificar registros com duração excepcional.
+
+Foram removidas viagens:
+
+```text
+ride_length <= 1 minuto
+```
+
+e
+
+```text
+ride_length > 1440 minutos
+```
+
+O limite superior de 1440 minutos corresponde a 24 horas.
+
+A utilização de um limite de 1 minuto para viagens muito curtas foi adotada como critério operacional de preparação dos dados, enquanto o limite de 24 horas foi utilizado para excluir registros excepcionalmente longos.
+
+Valores identificados como outliers pelo método do IQR não foram removidos automaticamente, pois a distribuição da duração das viagens apresenta assimetria à direita e muitos valores elevados podem representar viagens legítimas.
+
+---
+
+### 3. Armazenamento no PostgreSQL
+
+Após o tratamento, o dataset processado é carregado em um banco de dados **PostgreSQL**.
+
+A tabela principal utilizada na análise é:
+
+```text
+trips
+```
+
+O PostgreSQL foi escolhido como banco de dados analítico do projeto, permitindo a execução das consultas SQL utilizadas na etapa seguinte.
+
+O processo de carregamento inclui:
+
+* criação do banco de dados;
+* criação da tabela `trips`;
+* carregamento do dataset processado;
+* validação da quantidade de registros;
+* verificação da estrutura da tabela;
+* validação dos dados carregados.
+
+---
 
 ### 4. Análise com SQL
 
-Consultas SQL serão utilizadas para aprofundar a análise dos dados e responder perguntas específicas relacionadas ao comportamento dos usuários.
+A etapa analítica é realizada principalmente utilizando **SQL no PostgreSQL**.
 
-As consultas serão mantidas em arquivos `.sql` separados e executadas sobre o conjunto de dados consolidado.
+As consultas foram organizadas por temas para facilitar a interpretação dos resultados e demonstrar diferentes recursos da linguagem.
 
-### 5. Visualização no Power BI
+Entre os recursos utilizados estão:
 
-Os principais resultados obtidos durante a análise serão utilizados na construção de um dashboard no **Power BI**.
+* `GROUP BY`;
+* agregações como `COUNT()` e `AVG()`;
+* `FILTER`;
+* `CASE`;
+* `JOIN`;
+* `WITH`;
+* funções de janela;
+* `ROW_NUMBER()`;
+* `RANK()`;
+* `PERCENTILE_CONT()`;
+* ordenação e filtragem de resultados.
 
-O dashboard terá como objetivo apresentar os principais indicadores e padrões encontrados de forma visual e interativa.
+As análises incluem:
+
+* distribuição entre members e casuals;
+* duração média e mediana;
+* utilização por tipo de bicicleta;
+* distribuição por dia da semana;
+* horários de maior utilização;
+* estações de início e término;
+* padrões de origem e destino;
+* diferenças de comportamento entre os tipos de usuários.
+
+---
+
+## Hipóteses de Análise
+
+Uma das principais hipóteses investigadas é que **members e casuals apresentam padrões de utilização diferentes**.
+
+A hipótese considera que os members podem apresentar um padrão de uso mais associado à mobilidade urbana cotidiana, enquanto os casuals podem apresentar maior concentração em períodos e locais associados a lazer, turismo e atividades recreativas.
+
+Essa hipótese não é assumida como conclusão. Ela será investigada considerando diferentes dimensões dos dados:
+
+* dia da semana;
+* horário;
+* duração das viagens;
+* tipo de bicicleta;
+* estações de início;
+* estações de término;
+* relações entre origem e destino;
+* comportamento ao longo dos meses.
+
+A combinação dessas variáveis permite avaliar se os padrões observados são consistentes com a hipótese inicial.
+
+---
+
+## 5. Visualização no Power BI
+
+Após a análise utilizando SQL, os principais resultados serão utilizados na construção de um dashboard no **Power BI**.
+
+O dashboard deverá apresentar os principais indicadores e padrões encontrados durante a análise, permitindo comparar os comportamentos de **members** e **casuals**.
+
+Entre os possíveis indicadores estão:
+
+* quantidade total de viagens;
+* participação de cada tipo de usuário;
+* duração média e mediana;
+* distribuição por dia da semana;
+* distribuição por horário;
+* tipo de bicicleta;
+* principais estações;
+* evolução temporal das viagens.
+
+---
 
 ## Ferramentas Utilizadas
 
-* **Python** — processamento e análise dos dados;
-* **Pandas** — manipulação e tratamento dos dados;
-* **NumPy** — operações e cálculos numéricos;
+* **Python** — processamento e preparação dos dados;
+* **Pandas** — manipulação, limpeza e transformação dos dados;
+* **NumPy** — operações numéricas;
 * **Matplotlib** — visualização de dados;
 * **Seaborn** — visualização e análise exploratória;
 * **Sweetviz** — inspeção exploratória automatizada;
-* **Jupyter Notebook** — desenvolvimento e documentação das análises;
+* **Jupyter Notebook** — exploração, tratamento e documentação;
+* **PostgreSQL** — armazenamento e análise dos dados;
 * **SQL** — consultas e análise dos dados;
-* **DuckDB** — execução das consultas SQL;
-* **Power BI** — criação do dashboard e visualização dos resultados;
+* **Power BI** — visualização e apresentação dos resultados;
 * **Git e GitHub** — versionamento e documentação do projeto.
+
+---
+
+## Situação Atual do Projeto
+
+O projeto encontra-se na etapa de **análise dos dados utilizando SQL**.
+
+As principais etapas já concluídas são:
+
+* [x] Download dos dados mensais;
+* [x] Organização dos arquivos;
+* [x] Exploração inicial;
+* [x] Consolidação dos datasets;
+* [x] Inspeção inicial com Sweetviz;
+* [x] Tratamento de valores ausentes;
+* [x] Tratamento de registros duplicados;
+* [x] Padronização dos tipos de dados;
+* [x] Tratamento de inconsistências temporais;
+* [x] Criação de variáveis derivadas;
+* [x] Tratamento de valores extremos de duração;
+* [x] Validação do dataset processado;
+* [x] Carregamento dos dados no PostgreSQL;
+* [x] Estruturação das consultas SQL;
+* [x] Análise inicial do perfil dos usuários;
+* [ ] Finalização das análises SQL;
+* [ ] Construção do dashboard no Power BI;
+* [ ] Consolidação dos principais insights;
+* [ ] Finalização da documentação dos resultados.
+
+---
 
 ## Resultados
 
-Esta seção será atualizada após a conclusão das etapas de análise, apresentando os principais padrões, descobertas e conclusões obtidas a partir dos dados.
+A análise encontra-se em andamento.
+
+Os resultados finais serão apresentados nesta seção após a conclusão das consultas SQL e do dashboard no Power BI.
+
+Entre os pontos que estão sendo investigados estão as diferenças de comportamento entre **members** e **casuals**, especialmente em relação a:
+
+* frequência de utilização;
+* dias da semana;
+* horários;
+* duração das viagens;
+* tipo de bicicleta;
+* estações utilizadas;
+* padrões de origem e destino.
+
+---
 
 ## Fonte dos Dados
 
@@ -335,6 +521,4 @@ Esta seção será atualizada após a conclusão das etapas de análise, apresen
 
 Os dados são disponibilizados publicamente pela Divvy e utilizados neste projeto para fins de análise de dados e aprendizado.
 
-**Link dos Dados:**
-
-https://divvy-tripdata.s3.amazonaws.com/index.html
+[Divvy Trip Data — Dados históricos de viagens](https://divvy-tripdata.s3.amazonaws.com/index.html?utm_source=chatgpt.com)
