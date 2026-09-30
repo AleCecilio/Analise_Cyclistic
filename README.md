@@ -521,4 +521,4 @@ Entre os pontos que estão sendo investigados estão as diferenças de comportam
 
 Os dados são disponibilizados publicamente pela Divvy e utilizados neste projeto para fins de análise de dados e aprendizado.
 
-[Divvy Trip Data — Dados históricos de viagens](https://divvy-tripdata.s3.amazonaws.com/index.html?utm_source=chatgpt.com)
+Fonte oficial: [Divvy Trip Data — Dados históricos de viagens](https://divvy-tripdata.s3.amazonaws.com/index.html?utm_source=chatgpt.com)
