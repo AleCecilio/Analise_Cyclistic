@@ -1,36 +1,45 @@
--- Quantidade e percentual de viagens por dia da semana 
+-- ============================================================
+-- 02_weekly_usage.sql
+-- Análise da utilização ao longo da semana
+-- ============================================================
+
+
+-- ============================================================
+-- 1. Quantidade e percentual de viagens por dia da semana
+-- ============================================================
 
 WITH numero_viagens_dia AS (
-    SELECT 
+    SELECT
         day_of_week,
         day_of_week_name,
-        COUNT(*) AS numero_de_viagens
-    FROM trips 
+        COUNT(*) AS numero_viagens
+    FROM trips
     GROUP BY day_of_week, day_of_week_name
 )
 
-SELECT 
+SELECT
     day_of_week,
     day_of_week_name,
-
     REPLACE(
         TO_CHAR(
-            numero_de_viagens, 'FM999G999G999'
+            numero_viagens,
+            'FM999G999G999'
         ),
         ',',
         '.'
-    ) AS numero_de_viagens,
-
+    ) AS numero_viagens,
     ROUND(
-        numero_de_viagens * 100.0 / SUM(numero_de_viagens) OVER (),
+        numero_viagens * 100.0
+        / SUM(numero_viagens) OVER (),
         2
-    ) AS percentual_de_viagens
-
+    ) AS percentual_viagens
 FROM numero_viagens_dia
 ORDER BY day_of_week;
 
 
--- Comparação entre dias úteis e finais de semana
+-- ============================================================
+-- 2. Comparação entre dias úteis e finais de semana
+-- ============================================================
 
 SELECT
     CASE
@@ -38,18 +47,23 @@ SELECT
             THEN 'Final de semana'
         ELSE 'Dia útil'
     END AS tipo_dia,
-	REPLACE(
-		TO_CHAR(
-    		COUNT(*), 'FM999G999G999'
-		),
-		',',
-		'.'
-	) AS numero_viagens
+    REPLACE(
+        TO_CHAR(
+            COUNT(*),
+            'FM999G999G999'
+        ),
+        ',',
+        '.'
+    ) AS numero_viagens
 FROM trips
 GROUP BY tipo_dia
-ORDER BY numero_viagens DESC;
+ORDER BY COUNT(*) DESC;
 
--- Distribuição de dias úteis vs. finais de semana por tipo de usuário
+
+-- ============================================================
+-- 3. Distribuição de dias úteis vs. finais de semana
+-- por tipo de usuário
+-- ============================================================
 
 SELECT
     member_casual,
@@ -59,18 +73,22 @@ SELECT
         ELSE 'Dia útil'
     END AS tipo_dia,
     REPLACE(
-		TO_CHAR(
-    		COUNT(*), 'FM999G999G999'
-		),
-		',',
-		'.'
-	) AS numero_viagens
+        TO_CHAR(
+            COUNT(*),
+            'FM999G999G999'
+        ),
+        ',',
+        '.'
+    ) AS numero_viagens
 FROM trips
 GROUP BY member_casual, tipo_dia
 ORDER BY member_casual, tipo_dia;
 
 
--- Dia da semana com maior número de viagens por tipo de usuário
+-- ============================================================
+-- 4. Dia da semana com maior número de viagens
+-- por tipo de usuário
+-- ============================================================
 
 WITH viagens_por_dia AS (
     SELECT
@@ -90,19 +108,23 @@ SELECT
     member_casual,
     day_of_week,
     day_of_week_name,
-	REPLACE(
-		TO_CHAR(
-    		total_viagens, 'FM999G999G999'
-		),
-		',',
-		'.'
-	) AS numero_total_viajens
+    REPLACE(
+        TO_CHAR(
+            total_viagens,
+            'FM999G999G999'
+        ),
+        ',',
+        '.'
+    ) AS numero_viagens
 FROM viagens_por_dia
 WHERE posicao = 1
 ORDER BY member_casual;
 
 
--- Média de viagens por dia da semana por tipo de usuário
+-- ============================================================
+-- 5. Média de viagens por dia da semana
+-- por tipo de usuário
+-- ============================================================
 
 WITH viagens_por_dia AS (
     SELECT
@@ -118,9 +140,9 @@ SELECT
     member_casual,
     day_of_week,
     day_of_week_name,
-	ROUND(
-		AVG(total_viagens), 2
-	) AS media_de_viagens
+    ROUND(
+        total_viagens,
+        2
+    ) AS media_de_viagens
 FROM viagens_por_dia
-GROUP BY member_casual, day_of_week, day_of_week_name
 ORDER BY member_casual, day_of_week, day_of_week_name;

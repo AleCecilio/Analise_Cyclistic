@@ -1,10 +1,24 @@
--- Consulta Inicial
+-- ============================================================
+-- 01_user_profile.sql
+-- Perfil geral e características dos usuários
+-- ============================================================
+
+
+-- ============================================================
+-- 1. Consulta inicial
+-- Visualização de uma amostra dos registros
+-- ============================================================
+
 SELECT *
 FROM trips
 LIMIT 10;
 
 
--- Distribuição das viagens por tipo de usuário
+-- ============================================================
+-- 2. Distribuição das viagens por tipo de usuário
+-- Quantidade e participação percentual de cada grupo
+-- ============================================================
+
 SELECT
     member_casual,
     COUNT(*) AS total_viagens,
@@ -17,8 +31,12 @@ GROUP BY member_casual
 ORDER BY total_viagens DESC;
 
 
--- Duração média e mediana das viagens por tipo de usuário
-SELECT 
+-- ============================================================
+-- 3. Duração média e mediana das viagens por tipo de usuário
+-- Permite comparar o comportamento de duração entre os grupos
+-- ============================================================
+
+SELECT
     member_casual,
     ROUND(
         AVG(ride_length),
@@ -34,30 +52,20 @@ GROUP BY member_casual
 ORDER BY duracao_media_viagens DESC;
 
 
--- Tipo de bicicleta por tipo de usuário
-SELECT 
+-- ============================================================
+-- 4. Tipo de bicicleta utilizado por tipo de usuário
+-- Quantidade de viagens realizadas com cada tipo de bicicleta
+-- ============================================================
+
+SELECT
     member_casual,
 
-    REPLACE(
-        TO_CHAR(
-            COUNT(*) FILTER (
-                WHERE rideable_type = 'electric_bike'
-            ),
-            'FM999G999G999'
-        ),
-        ',',
-        '.'
+    COUNT(*) FILTER (
+        WHERE rideable_type = 'electric_bike'
     ) AS qtd_bicicletas_eletricas,
 
-    REPLACE(
-        TO_CHAR(
-            COUNT(*) FILTER (
-                WHERE rideable_type = 'classic_bike'
-            ),
-            'FM999G999G999'
-        ),
-        ',',
-        '.'
+    COUNT(*) FILTER (
+        WHERE rideable_type = 'classic_bike'
     ) AS qtd_bicicletas_classicas
 
 FROM trips
@@ -65,101 +73,28 @@ GROUP BY member_casual
 ORDER BY member_casual;
 
 
-
--- Quantidade de viagens por dia da semana e tipo de usuário
+-- ============================================================
+-- 5. Participação dos tipos de bicicleta dentro de cada grupo
+-- Permite comparar a preferência relativa de members e casuals
+-- ============================================================
 
 SELECT
     member_casual,
 
-    REPLACE(
-        TO_CHAR(
-            COUNT(*) FILTER (WHERE day_of_week = 1),
-            'FM999G999G999'
-        ),
-        ',',
-        '.'
-    ) AS domingo,
+    ROUND(
+        COUNT(*) FILTER (
+            WHERE rideable_type = 'electric_bike'
+        ) * 100.0 / COUNT(*),
+        2
+    ) AS percentual_bicicletas_eletricas,
 
-    REPLACE(
-        TO_CHAR(
-            COUNT(*) FILTER (WHERE day_of_week = 2),
-            'FM999G999G999'
-        ),
-        ',',
-        '.'
-    ) AS segunda_feira,
-
-    REPLACE(
-        TO_CHAR(
-            COUNT(*) FILTER (WHERE day_of_week = 3),
-            'FM999G999G999'
-        ),
-        ',',
-        '.'
-    ) AS terca_feira,
-
-    REPLACE(
-        TO_CHAR(
-            COUNT(*) FILTER (WHERE day_of_week = 4),
-            'FM999G999G999'
-        ),
-        ',',
-        '.'
-    ) AS quarta_feira,
-
-    REPLACE(
-        TO_CHAR(
-            COUNT(*) FILTER (WHERE day_of_week = 5),
-            'FM999G999G999'
-        ),
-        ',',
-        '.'
-    ) AS quinta_feira,
-
-    REPLACE(
-        TO_CHAR(
-            COUNT(*) FILTER (WHERE day_of_week = 6),
-            'FM999G999G999'
-        ),
-        ',',
-        '.'
-    ) AS sexta_feira,
-
-    REPLACE(
-        TO_CHAR(
-            COUNT(*) FILTER (WHERE day_of_week = 7),
-            'FM999G999G999'
-        ),
-        ',',
-        '.'
-    ) AS sabado
+    ROUND(
+        COUNT(*) FILTER (
+            WHERE rideable_type = 'classic_bike'
+        ) * 100.0 / COUNT(*),
+        2
+    ) AS percentual_bicicletas_classicas
 
 FROM trips
 GROUP BY member_casual
-ORDER BY member_casual;
-
-
--- Hora mais comum de viagem por tipo de usuário
-
-WITH horarios AS (
-    SELECT
-        member_casual,
-        hour,
-        COUNT(*) AS total_viagens,
-        ROW_NUMBER() OVER (
-            PARTITION BY member_casual
-            ORDER BY COUNT(*) DESC
-        ) AS posicao
-    FROM trips
-    GROUP BY
-        member_casual,
-        hour
-)
-
-SELECT
-    member_casual,
-    hour,
-    total_viagens
-FROM horarios
-WHERE posicao <=10
 ORDER BY member_casual;

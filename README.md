@@ -417,9 +417,15 @@ As análises incluem:
 
 Uma das principais hipóteses investigadas é que **members e casuals apresentam padrões de utilização diferentes**.
 
-A hipótese considera que os members podem apresentar um padrão de uso mais associado à mobilidade urbana cotidiana, enquanto os casuals podem apresentar maior concentração em períodos e locais associados a lazer, turismo e atividades recreativas.
+A análise dos dados semanais e horários já apresenta diferenças consistentes entre os grupos.
 
-Essa hipótese não é assumida como conclusão. Ela será investigada considerando diferentes dimensões dos dados:
+Os **members** concentram uma parcela maior das viagens durante os dias úteis, enquanto os **casuals** apresentam uma participação relativamente maior aos finais de semana. Na distribuição por dia da semana, o maior volume dos members ocorre na **quarta-feira**, enquanto o maior volume dos casuals ocorre no **sábado**.
+
+A análise horária também apresenta diferenças. O horário com maior número de viagens para ambos os grupos é **17h**, porém os members apresentam forte utilização também durante a manhã e o restante do período comercial. Entre os casuals, a utilização apresenta maior concentração relativa durante a **tarde e a noite**.
+
+Esses padrões são compatíveis com a hipótese de que os grupos apresentam diferentes contextos de utilização das bicicletas. Entretanto, os dados de horário e dia da semana, isoladamente, não permitem determinar a finalidade das viagens.
+
+Para aprofundar essa hipótese, serão consideradas outras dimensões:
 
 * dia da semana;
 * horário;
@@ -430,7 +436,7 @@ Essa hipótese não é assumida como conclusão. Ela será investigada considera
 * relações entre origem e destino;
 * comportamento ao longo dos meses.
 
-A combinação dessas variáveis permite avaliar se os padrões observados são consistentes com a hipótese inicial.
+A combinação dessas variáveis permitirá verificar se os padrões observados permanecem consistentes em diferentes dimensões do dataset.
 
 ---
 
@@ -490,6 +496,8 @@ As principais etapas já concluídas são:
 * [x] Carregamento dos dados no PostgreSQL;
 * [x] Estruturação das consultas SQL;
 * [x] Análise inicial do perfil dos usuários;
+* [x] Análise da utilização ao longo da semana;
+* [x] Análise da utilização por horário e período do dia;
 * [ ] Finalização das análises SQL;
 * [ ] Construção do dashboard no Power BI;
 * [ ] Consolidação dos principais insights;
@@ -499,19 +507,78 @@ As principais etapas já concluídas são:
 
 ## Resultados
 
-A análise encontra-se em andamento.
+A análise encontra-se em andamento, mas alguns padrões já foram identificados.
 
-Os resultados finais serão apresentados nesta seção após a conclusão das consultas SQL e do dashboard no Power BI.
+### Perfil dos usuários
 
-Entre os pontos que estão sendo investigados estão as diferenças de comportamento entre **members** e **casuals**, especialmente em relação a:
+A análise inicial indica diferenças na participação e no comportamento entre **members** e **casuals**, incluindo diferenças na duração das viagens e na utilização dos diferentes tipos de bicicleta.
 
-* frequência de utilização;
-* dias da semana;
-* horários;
+### Utilização ao longo da semana
+
+A distribuição geral das viagens ao longo da semana apresenta variação moderada. O **sábado** concentra o maior volume de viagens, enquanto o **domingo** apresenta o menor.
+
+Quando os grupos são analisados separadamente, observa-se um padrão diferente:
+
+* **Members:** maior volume de viagens na **quarta-feira**, com maior concentração durante os dias úteis;
+* **Casuals:** maior volume de viagens no **sábado**, com participação relativamente maior aos finais de semana.
+
+No conjunto dos dados, foram observadas:
+
+```text
+Members
+Dias úteis:       2.968.134
+Finais de semana:   902.509
+
+Casuals
+Dias úteis:       1.307.763
+Finais de semana:   773.071
+```
+
+Esses valores indicam uma concentração mais acentuada das viagens dos members nos dias úteis, enquanto os casuals apresentam uma distribuição mais equilibrada entre dias úteis e finais de semana.
+
+### Utilização ao longo do dia
+
+A análise por horário mostra que **17h é o horário de maior utilização para ambos os grupos**.
+
+```text
+Members:  417.885 viagens às 17h
+Casuals:  197.592 viagens às 17h
+```
+
+Apesar de ambos apresentarem o pico às 17h, os padrões ao longo do dia diferem.
+
+Os members apresentam forte utilização durante a manhã e a tarde, enquanto os casuals apresentam maior concentração relativa durante a tarde e a noite.
+
+Na classificação por período do dia:
+
+```text
+Members
+Tarde:      1.643.820
+Manhã:      1.151.763
+Noite:        986.150
+Madrugada:     88.910
+
+Casuals
+Tarde:        941.247
+Noite:        594.890
+Manhã:        433.873
+Madrugada:    110.824
+```
+
+Esses resultados são compatíveis com diferentes padrões de utilização entre os grupos. No entanto, não permitem determinar diretamente a finalidade das viagens, sendo necessário combinar essas informações com duração, estações e outros fatores para aprofundar a análise.
+
+### Próximas análises
+
+As próximas etapas serão utilizadas para verificar se esses padrões também aparecem em outras dimensões dos dados, especialmente:
+
 * duração das viagens;
 * tipo de bicicleta;
-* estações utilizadas;
-* padrões de origem e destino.
+* estações mais utilizadas;
+* relações entre estações de origem e destino;
+* evolução temporal;
+* combinação entre horário, dia da semana e localização.
+
+Os resultados finais serão consolidados após a conclusão das análises SQL e do dashboard no Power BI.
 
 ---
 
@@ -521,4 +588,4 @@ Entre os pontos que estão sendo investigados estão as diferenças de comportam
 
 Os dados são disponibilizados publicamente pela Divvy e utilizados neste projeto para fins de análise de dados e aprendizado.
 
-Fonte oficial: [Divvy Trip Data — Dados históricos de viagens](https://divvy-tripdata.s3.amazonaws.com/index.html?utm_source=chatgpt.com)
+Fonte oficial: [Divvy Trip Data — Dados históricos de viagens](https://divvy-tripdata.s3.amazonaws.com/index.html)
