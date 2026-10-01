@@ -2,13 +2,11 @@
 
 ## Sobre o Projeto
 
-Este projeto consiste em uma análise de dados baseada no estudo de caso da **Cyclistic**, empresa fictícia utilizada no curso **Google Data Analytics**.
+Este projeto apresenta uma análise de dados baseada no estudo de caso da **Cyclistic**, empresa fictícia utilizada no curso **Google Data Analytics**.
 
-A análise utiliza dados históricos de viagens do sistema de compartilhamento de bicicletas **Divvy**, de Chicago, Illinois, EUA, com o objetivo de identificar padrões de utilização e diferenças no comportamento entre os diferentes tipos de usuários.
+São utilizados dados históricos do sistema de compartilhamento de bicicletas **Divvy**, de Chicago, Illinois, com o objetivo de identificar padrões de utilização e diferenças de comportamento entre **members** e **casuals**.
 
-O projeto utiliza **Python, Pandas, PostgreSQL, SQL e Power BI**, abrangendo etapas de exploração, limpeza, tratamento, análise e visualização dos dados.
-
-O fluxo principal do projeto é:
+O projeto percorre um fluxo completo de análise de dados, desde a exploração e preparação dos dados até a análise com SQL e posterior visualização no Power BI.
 
 ```text
 Dados brutos
@@ -30,130 +28,59 @@ Power BI
 
 ## Objetivo
 
-O objetivo principal deste projeto é analisar o comportamento dos usuários do serviço de compartilhamento de bicicletas e identificar diferenças nos padrões de utilização entre **members** e **casuals**.
+O objetivo é analisar como os diferentes tipos de usuários utilizam o serviço e identificar diferenças relacionadas a:
 
-Entre os aspectos analisados estão:
+* frequência de utilização;
+* dias da semana;
+* horários;
+* duração das viagens;
+* tipo de bicicleta;
+* estações de origem e destino;
+* evolução temporal.
 
-* Perfil dos usuários;
-* Frequência de utilização;
-* Duração das viagens;
-* Distribuição das viagens ao longo da semana;
-* Distribuição das viagens ao longo do dia;
-* Comportamento ao longo dos meses;
-* Utilização das estações;
-* Tipo de bicicleta utilizada;
-* Diferenças de comportamento entre os tipos de usuários.
-
-Além da análise descritiva, o projeto busca investigar a hipótese de que os diferentes tipos de usuários apresentam padrões de utilização distintos, especialmente em relação a **dias da semana, horários, duração das viagens e localização das estações**.
+A análise busca verificar se **members e casuals apresentam padrões de utilização distintos**, utilizando diferentes dimensões dos dados para sustentar essa investigação.
 
 ---
 
-## Fontes de Dados
+## Dados
 
-Os dados utilizados neste projeto são provenientes do conjunto **Divvy Trip Data**, disponibilizado publicamente pela Divvy, sistema de compartilhamento de bicicletas de Chicago, Illinois, EUA.
+Os dados utilizados são provenientes do **Divvy Trip Data**, disponibilizado publicamente pela Divvy.
 
-Os dados são disponibilizados mensalmente em arquivos CSV compactados em arquivos ZIP.
+### Período analisado
 
-### Período Analisado
-
-Foram utilizados os **12 meses de dados selecionados para o estudo de caso**, abrangendo:
+Foram utilizados 12 meses de dados:
 
 **Setembro de 2025 a agosto de 2026.**
 
-Arquivos utilizados:
-
-```text
-202509-divvy-tripdata.csv
-202510-divvy-tripdata.csv
-202511-divvy-tripdata.csv
-202512-divvy-tripdata.csv
-202601-divvy-tripdata.csv
-202602-divvy-tripdata.csv
-202603-divvy-tripdata.csv
-202604-divvy-tripdata.csv
-202605-divvy-tripdata.csv
-202606-divvy-tripdata.csv
-202607-divvy-tripdata.csv
-202608-divvy-tripdata.csv
-```
-
-Os arquivos ZIP originais correspondentes foram utilizados para obtenção dos arquivos CSV.
-
-### Convenção dos Nomes dos Arquivos
-
-Os arquivos seguem o padrão:
-
-```text
-YYYYMM-divvy-tripdata.csv
-```
-
-Por exemplo:
-
-```text
-202509-divvy-tripdata.csv
-```
-
-representa os dados referentes a setembro de 2025.
-
-O trecho `YYYYMM` corresponde a:
-
-```text
-YYYY = ano
-MM   = mês
-```
-
-Assim:
-
-```text
-202509 → setembro de 2025
-202510 → outubro de 2025
-202511 → novembro de 2025
-202512 → dezembro de 2025
-202601 → janeiro de 2026
-202602 → fevereiro de 2026
-202603 → março de 2026
-202604 → abril de 2026
-202605 → maio de 2026
-202606 → junho de 2026
-202607 → julho de 2026
-202608 → agosto de 2026
-```
-
-Os arquivos mensais são combinados utilizando **Python e Pandas**.
-
-O dataset consolidado inicialmente é salvo como:
+Os arquivos mensais foram consolidados com Python e Pandas em:
 
 ```text
 cyclistic_202509_202608.csv
 ```
 
-Após as etapas de limpeza e tratamento, o dataset processado é salvo como:
+Após o tratamento, o dataset processado é salvo como:
 
 ```text
 cyclistic_202509_202608_processed.csv
 ```
 
----
+### Principais variáveis
 
-## Variáveis dos Dados
-
-Os arquivos originais contêm informações sobre as viagens realizadas pelos usuários, incluindo:
+Os dados originais contêm informações como:
 
 * `ride_id` — identificador da viagem;
-* `rideable_type` — tipo de bicicleta utilizada;
-* `started_at` — data e horário de início da viagem;
-* `ended_at` — data e horário de término da viagem;
-* `start_station_name` — nome da estação de início;
-* `start_station_id` — identificador da estação de início;
-* `end_station_name` — nome da estação de término;
-* `end_station_id` — identificador da estação de término;
-* `start_lat` — latitude da estação de início;
-* `start_lng` — longitude da estação de início;
-* `end_lat` — latitude da estação de término;
-* `end_lng` — longitude da estação de término;
+* `rideable_type` — tipo de bicicleta;
+* `started_at` — início da viagem;
+* `ended_at` — término da viagem;
+* `start_station_name` — estação de origem;
+* `start_station_id` — identificador da estação de origem;
+* `end_station_name` — estação de destino;
+* `end_station_id` — identificador da estação de destino;
+* `start_lat` / `start_lng` — coordenadas de origem;
+* `end_lat` / `end_lng` — coordenadas de destino;
 * `member_casual` — tipo de usuário.
 
-Durante o processo de tratamento, também foram criadas variáveis derivadas:
+Durante o tratamento foram criadas:
 
 * `ride_length` — duração da viagem em minutos;
 * `day_of_week` — número correspondente ao dia da semana;
@@ -166,28 +93,11 @@ Durante o processo de tratamento, também foram criadas variáveis derivadas:
 
 ```text
 Analise_Cyclistic/
-
+│
 ├── data/
 │   ├── raw/
-│   │   ├── 202509-divvy-tripdata.csv
-│   │   ├── 202510-divvy-tripdata.csv
-│   │   ├── 202511-divvy-tripdata.csv
-│   │   ├── 202512-divvy-tripdata.csv
-│   │   ├── 202601-divvy-tripdata.csv
-│   │   ├── 202602-divvy-tripdata.csv
-│   │   ├── 202603-divvy-tripdata.csv
-│   │   ├── 202604-divvy-tripdata.csv
-│   │   ├── 202605-divvy-tripdata.csv
-│   │   ├── 202606-divvy-tripdata.csv
-│   │   ├── 202607-divvy-tripdata.csv
-│   │   └── 202608-divvy-tripdata.csv
-│   │
 │   ├── raw_zip/
-│   │   └── arquivos ZIP originais
-│   │
 │   └── processed/
-│       ├── cyclistic_202509_202608.csv
-│       └── cyclistic_202509_202608_processed.csv
 │
 ├── notebooks/
 │   ├── 01_initial_exploration.ipynb
@@ -210,375 +120,317 @@ Analise_Cyclistic/
 └── .gitignore
 ```
 
-> **Observação:** os diretórios `data/raw/`, `data/raw_zip/` e `data/processed/` são mantidos localmente e não são versionados no GitHub devido ao grande volume dos arquivos. O arquivo `.env` também não é versionado por conter as credenciais de acesso ao banco de dados.
+Os arquivos de dados e o `.env` são mantidos localmente e não são versionados no GitHub.
 
 ---
 
-## Organização das Pastas
+## Metodologia
 
-### `data/raw/`
+### 1. Exploração inicial
 
-Armazena os arquivos CSV originais, sem alterações, referentes aos meses analisados.
+A exploração foi realizada em Python utilizando Pandas, Jupyter Notebook e Sweetviz.
 
-### `data/raw_zip/`
+Foram analisados:
 
-Armazena os arquivos ZIP originais disponibilizados pela fonte dos dados.
+* estrutura dos arquivos mensais;
+* quantidade de registros;
+* tipos de dados;
+* variáveis disponíveis;
+* valores ausentes;
+* duplicidades;
+* consistência dos dados;
+* diferenças entre os arquivos mensais.
 
-### `data/processed/`
+Os arquivos foram posteriormente consolidados em um único dataset.
 
-Armazena os datasets consolidados e processados utilizados nas etapas posteriores da análise.
+### 2. Limpeza e preparação
 
-### `notebooks/`
-
-Contém os notebooks utilizados para exploração e preparação dos dados.
-
-#### `01_initial_exploration.ipynb`
-
-Responsável pela exploração inicial dos arquivos mensais, incluindo:
-
-* carregamento dos datasets;
-* comparação entre os arquivos;
-* análise da estrutura;
-* identificação das variáveis;
-* análise dos tipos de dados;
-* inspeção inicial da qualidade dos dados;
-* consolidação dos arquivos mensais.
-
-#### `02_data_cleaning.ipynb`
-
-Responsável pelo processo de limpeza e preparação do dataset consolidado.
-
-As principais etapas realizadas incluem:
+O processo de tratamento incluiu:
 
 * tratamento de valores ausentes;
-* identificação e tratamento de registros duplicados;
-* conversão e padronização de datas;
-* verificação de inconsistências;
-* tratamento de registros com duração inválida;
-* criação de variáveis derivadas;
-* análise de valores atípicos;
-* validação do dataset após o tratamento;
-* geração do dataset processado;
-* preparação dos dados para carregamento no PostgreSQL.
-
-### `sql/`
-
-Contém as consultas SQL utilizadas na etapa de análise.
-
-As consultas estão separadas por tema:
-
-* `01_user_profile.sql` — perfil e comportamento geral dos usuários;
-* `02_weekly_usage.sql` — utilização ao longo da semana;
-* `03_hourly_usage.sql` — utilização ao longo das horas do dia;
-* `04_ride_duration.sql` — análise da duração das viagens;
-* `05_station_analysis.sql` — análise das estações e padrões de utilização por localização.
-
-As consultas são executadas sobre a tabela `trips` armazenada no PostgreSQL.
-
-### `powerbi/`
-
-Contém o dashboard desenvolvido no Power BI para apresentação dos principais resultados da análise.
-
-### `.env`
-
-Arquivo utilizado para armazenar localmente as configurações de conexão com o PostgreSQL, como usuário, senha, porta e nome do banco de dados.
-
-Esse arquivo não é versionado no GitHub.
-
----
-
-## Etapas da Análise
-
-### 1. Exploração Inicial
-
-A primeira etapa consiste na compreensão dos datasets disponibilizados pela Divvy.
-
-Foram realizadas atividades como:
-
-* carregamento dos arquivos mensais;
-* comparação da estrutura dos datasets;
-* identificação das variáveis;
-* verificação dos tipos de dados;
-* análise da quantidade de registros;
-* identificação inicial de valores ausentes;
-* consolidação dos arquivos mensais.
-
-O **Sweetviz** foi utilizado como ferramenta auxiliar para inspeção exploratória automatizada.
-
-Devido ao grande volume de registros, a geração do relatório exploratório utiliza uma amostra dos dados. As decisões de tratamento, entretanto, são realizadas considerando o dataset completo.
-
----
-
-### 2. Limpeza e Tratamento dos Dados
-
-Após a exploração inicial, foi realizado o processo de preparação dos dados.
-
-Entre os procedimentos realizados estão:
-
-* tratamento de valores ausentes;
-* identificação e tratamento de registros duplicados;
+* identificação de registros duplicados;
 * conversão das variáveis temporais;
-* padronização dos dados;
 * verificação de inconsistências;
-* criação da duração das viagens;
-* criação de variáveis temporais;
+* criação de variáveis derivadas;
+* tratamento da duração das viagens;
 * análise de valores atípicos;
 * validação do dataset final.
 
-#### Tratamento de inconsistências temporais
+#### Inconsistências temporais
 
-Foram identificados registros em que `ended_at` apresentava um horário anterior a `started_at`.
+Foram identificados 29 registros em que `ended_at` apresentava horário anterior a `started_at`.
 
-Os registros encontrados estavam concentrados em **2 de novembro de 2025**, durante a transição do horário de verão em Chicago.
+Os registros estavam concentrados em **2 de novembro de 2025**, durante a transição do horário de verão em Chicago. A ocorrência foi considerada no cálculo da duração para evitar valores negativos.
 
-A ocorrência foi considerada no cálculo de `ride_length`, evitando que essas viagens fossem interpretadas como tendo duração negativa.
+#### Duração das viagens
 
-#### Tratamento da duração das viagens
-
-A variável `ride_length` foi utilizada para identificar registros com duração excepcional.
-
-Foram removidas viagens:
+Foram removidas viagens com:
 
 ```text
 ride_length <= 1 minuto
 ```
 
-e
+e:
 
 ```text
 ride_length > 1440 minutos
 ```
 
-O limite superior de 1440 minutos corresponde a 24 horas.
+O limite superior corresponde a 24 horas.
 
-A utilização de um limite de 1 minuto para viagens muito curtas foi adotada como critério operacional de preparação dos dados, enquanto o limite de 24 horas foi utilizado para excluir registros excepcionalmente longos.
-
-Valores identificados como outliers pelo método do IQR não foram removidos automaticamente, pois a distribuição da duração das viagens apresenta assimetria à direita e muitos valores elevados podem representar viagens legítimas.
+Valores classificados como outliers pelo IQR não foram removidos automaticamente, considerando a assimetria da distribuição e a possibilidade de representarem viagens legítimas.
 
 ---
 
-### 3. Armazenamento no PostgreSQL
+## PostgreSQL
 
-Após o tratamento, o dataset processado é carregado em um banco de dados **PostgreSQL**.
-
-A tabela principal utilizada na análise é:
+O dataset processado é carregado no **PostgreSQL**, onde é armazenado na tabela:
 
 ```text
 trips
 ```
 
-O PostgreSQL foi escolhido como banco de dados analítico do projeto, permitindo a execução das consultas SQL utilizadas na etapa seguinte.
-
-O processo de carregamento inclui:
-
-* criação do banco de dados;
-* criação da tabela `trips`;
-* carregamento do dataset processado;
-* validação da quantidade de registros;
-* verificação da estrutura da tabela;
-* validação dos dados carregados.
-
----
-
-### 4. Análise com SQL
-
-A etapa analítica é realizada principalmente utilizando **SQL no PostgreSQL**.
-
-As consultas foram organizadas por temas para facilitar a interpretação dos resultados e demonstrar diferentes recursos da linguagem.
+O banco é utilizado como ambiente para a etapa analítica, permitindo realizar consultas sobre o dataset tratado.
 
 Entre os recursos utilizados estão:
 
+* agregações;
 * `GROUP BY`;
-* agregações como `COUNT()` e `AVG()`;
-* `FILTER`;
 * `CASE`;
-* `JOIN`;
+* `FILTER`;
 * `WITH`;
 * funções de janela;
 * `ROW_NUMBER()`;
-* `RANK()`;
 * `PERCENTILE_CONT()`;
-* ordenação e filtragem de resultados.
-
-As análises incluem:
-
-* distribuição entre members e casuals;
-* duração média e mediana;
-* utilização por tipo de bicicleta;
-* distribuição por dia da semana;
-* horários de maior utilização;
-* estações de início e término;
-* padrões de origem e destino;
-* diferenças de comportamento entre os tipos de usuários.
+* `JOIN`;
+* ordenação e filtragem.
 
 ---
 
-## Hipóteses de Análise
+## Análise SQL
 
-Uma das principais hipóteses investigadas é que **members e casuals apresentam padrões de utilização diferentes**.
+As consultas foram organizadas por tema:
 
-A análise dos dados semanais e horários já apresenta diferenças consistentes entre os grupos.
-
-Os **members** concentram uma parcela maior das viagens durante os dias úteis, enquanto os **casuals** apresentam uma participação relativamente maior aos finais de semana. Na distribuição por dia da semana, o maior volume dos members ocorre na **quarta-feira**, enquanto o maior volume dos casuals ocorre no **sábado**.
-
-A análise horária também apresenta diferenças. O horário com maior número de viagens para ambos os grupos é **17h**, porém os members apresentam forte utilização também durante a manhã e o restante do período comercial. Entre os casuals, a utilização apresenta maior concentração relativa durante a **tarde e a noite**.
-
-Esses padrões são compatíveis com a hipótese de que os grupos apresentam diferentes contextos de utilização das bicicletas. Entretanto, os dados de horário e dia da semana, isoladamente, não permitem determinar a finalidade das viagens.
-
-Para aprofundar essa hipótese, serão consideradas outras dimensões:
-
-* dia da semana;
-* horário;
-* duração das viagens;
-* tipo de bicicleta;
-* estações de início;
-* estações de término;
-* relações entre origem e destino;
-* comportamento ao longo dos meses.
-
-A combinação dessas variáveis permitirá verificar se os padrões observados permanecem consistentes em diferentes dimensões do dataset.
-
----
-
-## 5. Visualização no Power BI
-
-Após a análise utilizando SQL, os principais resultados serão utilizados na construção de um dashboard no **Power BI**.
-
-O dashboard deverá apresentar os principais indicadores e padrões encontrados durante a análise, permitindo comparar os comportamentos de **members** e **casuals**.
-
-Entre os possíveis indicadores estão:
-
-* quantidade total de viagens;
-* participação de cada tipo de usuário;
-* duração média e mediana;
-* distribuição por dia da semana;
-* distribuição por horário;
-* tipo de bicicleta;
-* principais estações;
-* evolução temporal das viagens.
-
----
-
-## Ferramentas Utilizadas
-
-* **Python** — processamento e preparação dos dados;
-* **Pandas** — manipulação, limpeza e transformação dos dados;
-* **NumPy** — operações numéricas;
-* **Matplotlib** — visualização de dados;
-* **Seaborn** — visualização e análise exploratória;
-* **Sweetviz** — inspeção exploratória automatizada;
-* **Jupyter Notebook** — exploração, tratamento e documentação;
-* **PostgreSQL** — armazenamento e análise dos dados;
-* **SQL** — consultas e análise dos dados;
-* **Power BI** — visualização e apresentação dos resultados;
-* **Git e GitHub** — versionamento e documentação do projeto.
-
----
-
-## Situação Atual do Projeto
-
-O projeto encontra-se na etapa de **análise dos dados utilizando SQL**.
-
-As principais etapas já concluídas são:
-
-* [x] Download dos dados mensais;
-* [x] Organização dos arquivos;
-* [x] Exploração inicial;
-* [x] Consolidação dos datasets;
-* [x] Inspeção inicial com Sweetviz;
-* [x] Tratamento de valores ausentes;
-* [x] Tratamento de registros duplicados;
-* [x] Padronização dos tipos de dados;
-* [x] Tratamento de inconsistências temporais;
-* [x] Criação de variáveis derivadas;
-* [x] Tratamento de valores extremos de duração;
-* [x] Validação do dataset processado;
-* [x] Carregamento dos dados no PostgreSQL;
-* [x] Estruturação das consultas SQL;
-* [x] Análise inicial do perfil dos usuários;
-* [x] Análise da utilização ao longo da semana;
-* [x] Análise da utilização por horário e período do dia;
-* [ ] Finalização das análises SQL;
-* [ ] Construção do dashboard no Power BI;
-* [ ] Consolidação dos principais insights;
-* [ ] Finalização da documentação dos resultados.
-
----
-
-## Resultados
-
-A análise encontra-se em andamento, mas alguns padrões já foram identificados.
+| Arquivo                   | Análise                                 |
+| ------------------------- | --------------------------------------- |
+| `01_user_profile.sql`     | Perfil e características dos usuários   |
+| `02_weekly_usage.sql`     | Utilização ao longo da semana           |
+| `03_hourly_usage.sql`     | Utilização ao longo do dia              |
+| `04_ride_duration.sql`    | Duração das viagens                     |
+| `05_station_analysis.sql` | Estações e relações de origem e destino |
 
 ### Perfil dos usuários
 
-A análise inicial indica diferenças na participação e no comportamento entre **members** e **casuals**, incluindo diferenças na duração das viagens e na utilização dos diferentes tipos de bicicleta.
+São analisados:
 
-### Utilização ao longo da semana
+* distribuição entre `members` e `casuals`;
+* duração média e mediana;
+* tipos de bicicleta utilizados;
+* participação relativa de cada tipo de bicicleta.
 
-A distribuição geral das viagens ao longo da semana apresenta variação moderada. O **sábado** concentra o maior volume de viagens, enquanto o **domingo** apresenta o menor.
+### Utilização semanal
 
-Quando os grupos são analisados separadamente, observa-se um padrão diferente:
+A análise considera:
 
-* **Members:** maior volume de viagens na **quarta-feira**, com maior concentração durante os dias úteis;
-* **Casuals:** maior volume de viagens no **sábado**, com participação relativamente maior aos finais de semana.
+* quantidade de viagens por dia;
+* comparação entre dias úteis e finais de semana;
+* comportamento de cada tipo de usuário;
+* dia de maior utilização.
 
-No conjunto dos dados, foram observadas:
+### Utilização horária
+
+São analisados:
+
+* volume de viagens por hora;
+* comportamento horário de cada grupo;
+* horário de maior utilização;
+* distribuição por período do dia.
+
+### Duração das viagens
+
+A análise considera:
+
+* duração média e mediana por dia da semana;
+* duração por hora;
+* duração por período do dia;
+* duração por dia e tipo de usuário;
+* duração por período e tipo de usuário;
+* duração por dia, hora e tipo de usuário;
+* distribuição das viagens por faixas de duração.
+
+### Estações
+
+A análise de estações considera:
+
+* principais estações de origem;
+* principais estações de destino;
+* estações mais utilizadas por grupo;
+* relações entre origem e destino;
+* possíveis diferenças de localização entre `members` e `casuals`.
+
+---
+
+# Principais Resultados
+
+A análise ainda está em desenvolvimento, mas os resultados obtidos até o momento apresentam alguns padrões relevantes.
+
+## Utilização ao longo da semana
+
+No conjunto dos dados, o sábado apresenta a maior participação das viagens, com **15,62%**, enquanto o domingo apresenta a menor, com **12,53%**.
+
+Separando os grupos:
+
+| Tipo de usuário | Dias úteis | Finais de semana |
+| --------------- | ---------: | ---------------: |
+| Members         |  2.968.134 |          902.509 |
+| Casuals         |  1.307.763 |          773.071 |
+
+O maior volume de viagens dos `members` ocorre na **quarta-feira**, enquanto o dos `casuals` ocorre no **sábado**.
+
+Esse resultado mostra uma diferença na distribuição semanal dos grupos: os `members` apresentam maior concentração de viagens nos dias úteis, enquanto os `casuals` possuem participação relativamente maior nos finais de semana.
+
+---
+
+## Utilização ao longo do dia
+
+**17h é o horário de maior utilização para ambos os grupos.**
 
 ```text
-Members
-Dias úteis:       2.968.134
-Finais de semana:   902.509
-
-Casuals
-Dias úteis:       1.307.763
-Finais de semana:   773.071
+Members:  417.885 viagens
+Casuals:  197.592 viagens
 ```
 
-Esses valores indicam uma concentração mais acentuada das viagens dos members nos dias úteis, enquanto os casuals apresentam uma distribuição mais equilibrada entre dias úteis e finais de semana.
+A distribuição por período do dia apresenta:
 
-### Utilização ao longo do dia
+| Período   |   Members | Casuals |
+| --------- | --------: | ------: |
+| Tarde     | 1.643.820 | 941.247 |
+| Manhã     | 1.151.763 | 433.873 |
+| Noite     |   986.150 | 594.890 |
+| Madrugada |    88.910 | 110.824 |
 
-A análise por horário mostra que **17h é o horário de maior utilização para ambos os grupos**.
+Os `members` apresentam maior volume durante a tarde e manhã, enquanto os `casuals` apresentam maior participação relativa durante a tarde e noite.
 
-```text
-Members:  417.885 viagens às 17h
-Casuals:  197.592 viagens às 17h
-```
+Esses padrões são compatíveis com diferentes formas de utilização, mas os dados de horário e dia da semana, isoladamente, não permitem determinar a finalidade das viagens.
 
-Apesar de ambos apresentarem o pico às 17h, os padrões ao longo do dia diferem.
+---
 
-Os members apresentam forte utilização durante a manhã e a tarde, enquanto os casuals apresentam maior concentração relativa durante a tarde e a noite.
+## Duração das viagens
 
-Na classificação por período do dia:
+A duração média apresenta variações ao longo da semana, mas permanece dentro de uma faixa relativamente próxima.
 
-```text
-Members
-Tarde:      1.643.820
-Manhã:      1.151.763
-Noite:        986.150
-Madrugada:     88.910
+O sábado apresenta a maior média, com **16,90 minutos**, seguido pelo domingo, com **16,86 minutos**. A menor média ocorre na quarta-feira, com **12,68 minutos**.
 
-Casuals
-Tarde:        941.247
-Noite:        594.890
-Manhã:        433.873
-Madrugada:    110.824
-```
+Por hora, as maiores médias concentram-se principalmente entre **11h e 16h**, com o maior valor às **14h**, de **16,28 minutos**.
 
-Esses resultados são compatíveis com diferentes padrões de utilização entre os grupos. No entanto, não permitem determinar diretamente a finalidade das viagens, sendo necessário combinar essas informações com duração, estações e outros fatores para aprofundar a análise.
+Por período do dia:
 
-### Próximas análises
+| Período   |     Média |   Mediana |
+| --------- | --------: | --------: |
+| Tarde     | 15,32 min | 10,14 min |
+| Noite     | 14,08 min |  9,69 min |
+| Madrugada | 13,90 min |  8,51 min |
+| Manhã     | 13,17 min |  8,52 min |
 
-As próximas etapas serão utilizadas para verificar se esses padrões também aparecem em outras dimensões dos dados, especialmente:
+### Duração por tipo de usuário
 
-* duração das viagens;
-* tipo de bicicleta;
-* estações mais utilizadas;
-* relações entre estações de origem e destino;
-* evolução temporal;
-* combinação entre horário, dia da semana e localização.
+Os `casuals` apresentam duração média superior aos `members` em todos os dias analisados.
 
-Os resultados finais serão consolidados após a conclusão das análises SQL e do dashboard no Power BI.
+Entre os `casuals`:
+
+* maior média: **domingo — 21,22 min**;
+* menor média: **quarta-feira — 15,25 min**.
+
+Entre os `members`:
+
+* maior média: **sábado — 13,46 min**;
+* menor média: **quarta-feira — 11,69 min**.
+
+A variação entre os dias também é maior entre os `casuals`, enquanto os `members` apresentam durações mais próximas entre si.
+
+O mesmo padrão aparece na análise por período: os `casuals` apresentam maior duração média em todos os períodos, com destaque para a tarde, enquanto os `members` apresentam médias mais próximas entre os períodos.
+
+---
+
+## Distribuição por faixa de duração
+
+A maior parte das viagens concentra-se nas menores faixas de duração.
+
+| Faixa           | Casuals | Members |
+| --------------- | ------: | ------: |
+| Até 10 min      |  44,28% |  57,03% |
+| 11–20 min       |  30,38% |  28,76% |
+| 21–30 min       |  11,72% |   8,77% |
+| 31–60 min       |   9,62% |   4,79% |
+| 61–120 min      |   3,17% |   0,47% |
+| Mais de 120 min |   0,83% |   0,19% |
+
+Os dois grupos apresentam forte concentração em viagens curtas, mas essa concentração é maior entre os `members`: **57,03%** das viagens desse grupo possuem até 10 minutos, contra **44,28%** entre os `casuals`.
+
+Também é possível observar uma redução progressiva da participação conforme a duração aumenta.
+
+---
+
+## Interpretação inicial
+
+Os resultados obtidos até o momento indicam diferenças consistentes entre os grupos em diferentes dimensões:
+
+* `members` apresentam maior concentração de viagens nos dias úteis;
+* `casuals` possuem participação relativamente maior nos finais de semana;
+* ambos apresentam pico de utilização às 17h;
+* `casuals` apresentam viagens com maior duração média;
+* `members` apresentam maior concentração de viagens de até 10 minutos;
+* a duração dos `members` varia menos entre dias e períodos;
+* as diferenças de duração são mais acentuadas entre os `casuals`.
+
+Esses padrões ajudam a caracterizar os grupos, mas não permitem, isoladamente, determinar o motivo ou finalidade de cada viagem. A análise das estações, origens, destinos e evolução temporal será utilizada para complementar essa interpretação.
+
+---
+
+## Próximas Etapas
+
+O projeto encontra-se na etapa final da análise exploratória com SQL.
+
+### Concluído
+
+* [x] Download e organização dos dados;
+* [x] Exploração inicial;
+* [x] Consolidação dos arquivos mensais;
+* [x] Inspeção com Sweetviz;
+* [x] Tratamento de valores ausentes;
+* [x] Tratamento de duplicidades;
+* [x] Padronização dos dados;
+* [x] Tratamento de inconsistências temporais;
+* [x] Criação das variáveis derivadas;
+* [x] Tratamento da duração das viagens;
+* [x] Validação do dataset;
+* [x] Carregamento no PostgreSQL;
+* [x] Análise do perfil dos usuários;
+* [x] Análise semanal;
+* [x] Análise horária;
+* [x] Análise da duração das viagens.
+
+### Em andamento
+
+* [ ] Análise das estações;
+* [ ] Consolidação dos principais insights;
+* [ ] Desenvolvimento do dashboard no Power BI;
+* [ ] Revisão final da documentação.
+
+---
+
+## Ferramentas
+
+* **Python** — processamento e preparação dos dados;
+* **Pandas** — manipulação e transformação;
+* **NumPy** — operações numéricas;
+* **Matplotlib / Seaborn** — visualização;
+* **Sweetviz** — exploração automatizada;
+* **Jupyter Notebook** — exploração e documentação;
+* **PostgreSQL** — armazenamento e análise;
+* **SQL** — análise dos dados;
+* **Power BI** — visualização dos resultados;
+* **Git / GitHub** — versionamento.
 
 ---
 
@@ -586,6 +438,6 @@ Os resultados finais serão consolidados após a conclusão das análises SQL e 
 
 **Divvy — Bike Share Trip Data**
 
-Os dados são disponibilizados publicamente pela Divvy e utilizados neste projeto para fins de análise de dados e aprendizado.
+Dados históricos de viagens disponibilizados publicamente pela Divvy:
 
-Fonte oficial: [Divvy Trip Data — Dados históricos de viagens](https://divvy-tripdata.s3.amazonaws.com/index.html)
+[Divvy Trip Data — Dados históricos de viagens](https://divvy-tripdata.s3.amazonaws.com/index.html)
