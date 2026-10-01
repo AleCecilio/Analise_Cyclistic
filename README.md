@@ -36,7 +36,7 @@ O objetivo é analisar como os diferentes tipos de usuários utilizam o serviço
 * duração das viagens;
 * tipo de bicicleta;
 * estações de origem e destino;
-* evolução temporal.
+* rotas mais utilizadas.
 
 A análise busca verificar se **members e casuals apresentam padrões de utilização distintos**, utilizando diferentes dimensões dos dados para sustentar essa investigação.
 
@@ -93,6 +93,7 @@ Durante o tratamento foram criadas:
 
 ```text
 Analise_Cyclistic/
+
 │
 ├── data/
 │   ├── raw/
@@ -211,13 +212,13 @@ Entre os recursos utilizados estão:
 
 As consultas foram organizadas por tema:
 
-| Arquivo                   | Análise                                 |
-| ------------------------- | --------------------------------------- |
-| `01_user_profile.sql`     | Perfil e características dos usuários   |
-| `02_weekly_usage.sql`     | Utilização ao longo da semana           |
-| `03_hourly_usage.sql`     | Utilização ao longo do dia              |
-| `04_ride_duration.sql`    | Duração das viagens                     |
-| `05_station_analysis.sql` | Estações e relações de origem e destino |
+| Arquivo                   | Análise                               |
+| ------------------------- | ------------------------------------- |
+| `01_user_profile.sql`     | Perfil e características dos usuários |
+| `02_weekly_usage.sql`     | Utilização ao longo da semana         |
+| `03_hourly_usage.sql`     | Utilização ao longo do dia            |
+| `04_ride_duration.sql`    | Duração das viagens                   |
+| `05_station_analysis.sql` | Estações, origens, destinos e rotas   |
 
 ### Perfil dos usuários
 
@@ -244,7 +245,8 @@ São analisados:
 * volume de viagens por hora;
 * comportamento horário de cada grupo;
 * horário de maior utilização;
-* distribuição por período do dia.
+* distribuição por período do dia;
+* relação entre período, tipo de dia e tipo de usuário.
 
 ### Duração das viagens
 
@@ -264,19 +266,43 @@ A análise de estações considera:
 
 * principais estações de origem;
 * principais estações de destino;
-* estações mais utilizadas por grupo;
-* relações entre origem e destino;
-* possíveis diferenças de localização entre `members` e `casuals`.
+* composição das estações por tipo de usuário;
+* estações mais utilizadas por dia da semana e tipo de usuário;
+* estações associadas às maiores e menores durações médias;
+* rotas mais utilizadas por tipo de usuário.
 
 ---
 
 # Principais Resultados
 
-A análise ainda está em desenvolvimento, mas os resultados obtidos até o momento apresentam alguns padrões relevantes.
+A análise dos 12 meses de dados identificou diferenças entre `members` e `casuals` em relação à distribuição semanal, horários, duração das viagens, tipo de bicicleta e utilização das estações.
+
+## Perfil dos usuários
+
+A distribuição geral das viagens mostra maior volume de viagens realizadas por `members` do que por `casuals`.
+
+Além da quantidade de viagens, também foi analisada a utilização dos diferentes tipos de bicicleta.
+
+### Tipo de bicicleta
+
+As bicicletas elétricas apresentam maior volume de utilização do que as bicicletas clássicas nos dois grupos.
+
+| Tipo de usuário | Elétricas | Clássicas |
+| --------------- | --------: | --------: |
+| Casuals         | 1.514.975 |   565.859 |
+| Members         | 2.608.278 | 1.262.365 |
+
+Entre os `casuals`, foram registradas **1.514.975 viagens com bicicletas elétricas** e **565.859 com bicicletas clássicas**.
+
+Entre os `members`, foram registradas **2.608.278 viagens com bicicletas elétricas** e **1.262.365 com bicicletas clássicas**.
+
+Portanto, as bicicletas elétricas representam o maior volume de utilização nos dois grupos.
+
+---
 
 ## Utilização ao longo da semana
 
-No conjunto dos dados, o sábado apresenta a maior participação das viagens, com **15,62%**, enquanto o domingo apresenta a menor, com **12,53%**.
+No conjunto dos dados, o sábado apresenta a maior participação das viagens, com **15,62%**, enquanto o domingo apresenta **12,53%**.
 
 Separando os grupos:
 
@@ -309,7 +335,7 @@ A distribuição por período do dia apresenta:
 | Noite     |   986.150 | 594.890 |
 | Madrugada |    88.910 | 110.824 |
 
-Os `members` apresentam maior volume durante a tarde e manhã, enquanto os `casuals` apresentam maior participação relativa durante a tarde e noite.
+Os `members` apresentam maior volume durante a tarde e manhã, enquanto os `casuals` apresentam participação relativamente maior durante a tarde e noite.
 
 Esses padrões são compatíveis com diferentes formas de utilização, mas os dados de horário e dia da semana, isoladamente, não permitem determinar a finalidade das viagens.
 
@@ -317,7 +343,7 @@ Esses padrões são compatíveis com diferentes formas de utilização, mas os d
 
 ## Duração das viagens
 
-A duração média apresenta variações ao longo da semana, mas permanece dentro de uma faixa relativamente próxima.
+A duração média apresenta variações ao longo da semana.
 
 O sábado apresenta a maior média, com **16,90 minutos**, seguido pelo domingo, com **16,86 minutos**. A menor média ocorre na quarta-feira, com **12,68 minutos**.
 
@@ -371,25 +397,124 @@ Também é possível observar uma redução progressiva da participação confor
 
 ---
 
-## Interpretação inicial
+## Análise das estações
 
-Os resultados obtidos até o momento indicam diferenças consistentes entre os grupos em diferentes dimensões:
+A análise das estações mostrou diferenças claras na composição das principais estações de origem e destino.
+
+### Principais estações de origem
+
+Entre as estações com maior volume de viagens, algumas apresentam forte concentração de um dos grupos.
+
+A **Navy Pier**, por exemplo, registra **66.991 viagens de início**, sendo **75,93% de casuals** e **24,07% de members**.
+
+Em contraste, a **Canal St & Adams St** registra **61.279 viagens**, com **77,25% de members** e **22,75% de casuals**.
+
+Outros exemplos:
+
+| Estação                           |  Total | Members | Casuals |
+| --------------------------------- | -----: | ------: | ------: |
+| Navy Pier                         | 66.991 |  24,07% |  75,93% |
+| Canal St & Adams St               | 61.279 |  77,25% |  22,75% |
+| DuSable Lake Shore Dr & Monroe St | 56.235 |  27,94% |  72,06% |
+| Dearborn Pkwy & Delaware Pl       | 55.111 |  70,65% |  29,35% |
+| Kingsbury St & Kinzie St 2        | 46.625 |  76,35% |  23,65% |
+
+As estações de destino apresentam composição semelhante. A **Navy Pier** também se destaca entre os destinos, com **66.720 viagens**, sendo **78,05% de casuals**.
+
+### Estação mais utilizada por dia e tipo de usuário
+
+A análise por dia da semana mostrou um padrão particularmente consistente:
+
+* a **Navy Pier** é a principal estação de início dos `casuals` em todos os dias da semana;
+* entre os `members`, a **Canal St & Adams St** ocupa a primeira posição de segunda a quinta-feira;
+* entre sexta-feira, sábado e domingo, a **Dearborn Pkwy & Delaware Pl** é a principal estação de início dos `members`.
+
+No sábado, a Navy Pier registra **13.299 viagens de início de casuals**, sendo o maior valor observado nessa análise.
+
+Esses resultados mostram que a concentração das viagens nas estações não ocorre de maneira uniforme entre os dois grupos.
+
+### Duração por estação
+
+Também foram analisadas as estações com maiores e menores durações médias, considerando apenas estações com pelo menos 100 viagens.
+
+Entre as maiores médias, destacam-se:
+
+| Estação                            | Viagens |     Média |   Mediana |
+| ---------------------------------- | ------: | --------: | --------: |
+| Cumberland Ave & Catherine Ave     |     152 | 65,18 min | 34,28 min |
+| Burnham Greenway & 112th St        |     150 | 43,94 min | 38,35 min |
+| Mason Ave & Montrose Ave           |     262 | 41,57 min | 16,51 min |
+| Public Rack - Justine St & 87th St |     172 | 41,36 min | 29,88 min |
+| Karlov Ave & Madison St            |     121 | 41,29 min | 21,90 min |
+
+Entre as menores médias:
+
+| Estação                              | Viagens |    Média |  Mediana |
+| ------------------------------------ | ------: | -------: | -------: |
+| Public Rack - Pulaski Rd & 44th St   |     120 | 4,26 min | 3,02 min |
+| Public Rack - Foster Ave & Drake Ave |     204 | 6,84 min | 2,86 min |
+| University Ave & 65th St             |   3.504 | 7,64 min | 4,74 min |
+| Public Rack - Lighthouse Beach       |   3.697 | 7,95 min | 5,90 min |
+| University Ave & 57th St             |  37.499 | 8,01 min | 4,70 min |
+
+A diferença entre média e mediana em algumas estações também indica a presença de distribuições assimétricas. Por exemplo, **Mason Ave & Montrose Ave** apresenta média de 41,57 minutos e mediana de 16,51 minutos.
+
+Esses resultados descrevem diferenças de duração associadas às estações de início, mas não permitem afirmar que a estação seja a causa dessas diferenças.
+
+### Rotas mais utilizadas
+
+A análise das combinações entre estação de origem e destino revelou padrões diferentes entre os grupos.
+
+Entre os `casuals`, aparecem com destaque diversas rotas envolvendo a **Navy Pier** e a **DuSable Lake Shore Dr & Monroe St**, além de várias viagens em que a estação de origem e destino é a mesma.
+
+As principais rotas incluem:
+
+* Navy Pier → Navy Pier: **9.482 viagens**;
+* DuSable Lake Shore Dr & Monroe St → mesma estação: **8.148**;
+* DuSable Lake Shore Dr & Monroe St → Navy Pier: **5.212**;
+* Michigan Ave & Oak St → mesma estação: **3.509**.
+
+Entre os `members`, as principais rotas apresentam maior presença de deslocamentos entre estações distintas, especialmente na região de **University Ave, Blackstone Ave e Ellis Ave**.
+
+Entre elas:
+
+* Blackstone Ave & 59th St → University Ave & 57th St: **3.421 viagens**;
+* University Ave & 57th St → mesma estação: **3.362**;
+* University Ave & 57th St → Blackstone Ave & 59th St: **3.232**;
+* Ellis Ave & 60th St → University Ave & 57th St: **3.194**.
+
+As viagens com a mesma estação de origem e destino aparecem nos dois grupos. Esse padrão pode ser descrito como uma característica das rotas observadas, mas não permite determinar, isoladamente, a finalidade da viagem.
+
+---
+
+## Interpretação Final
+
+A análise dos 12 meses de dados apresenta diferenças consistentes entre `members` e `casuals` em diversas dimensões.
+
+Os principais padrões identificados foram:
 
 * `members` apresentam maior concentração de viagens nos dias úteis;
 * `casuals` possuem participação relativamente maior nos finais de semana;
-* ambos apresentam pico de utilização às 17h;
-* `casuals` apresentam viagens com maior duração média;
+* sábado é o dia com maior participação geral das viagens;
+* 17h é o horário de maior utilização para ambos os grupos;
+* bicicletas elétricas apresentam maior volume de utilização do que bicicletas clássicas nos dois grupos;
+* `casuals` apresentam maior duração média das viagens em todos os dias e períodos analisados;
 * `members` apresentam maior concentração de viagens de até 10 minutos;
-* a duração dos `members` varia menos entre dias e períodos;
-* as diferenças de duração são mais acentuadas entre os `casuals`.
+* a duração das viagens apresenta maior variação entre os `casuals`;
+* algumas estações apresentam forte concentração de `casuals`, enquanto outras são predominantemente utilizadas por `members`;
+* a Navy Pier se destaca entre as estações utilizadas por `casuals`;
+* Canal St & Adams St e Dearborn Pkwy & Delaware Pl apresentam forte presença de `members`;
+* as principais rotas diferem entre os grupos, com maior presença de determinadas regiões e combinações de estações para cada perfil.
 
-Esses padrões ajudam a caracterizar os grupos, mas não permitem, isoladamente, determinar o motivo ou finalidade de cada viagem. A análise das estações, origens, destinos e evolução temporal será utilizada para complementar essa interpretação.
+Em conjunto, esses resultados mostram que os dois grupos apresentam **padrões de utilização distintos em relação ao momento, duração, tipo de bicicleta, localização e combinação entre estações**.
+
+Ao mesmo tempo, os dados analisados não permitem determinar isoladamente a finalidade de cada viagem. Dessa forma, as conclusões são apresentadas como padrões observados no comportamento de utilização, evitando atribuir uma finalidade específica às viagens sem evidências adicionais.
 
 ---
 
 ## Próximas Etapas
 
-O projeto encontra-se na etapa final da análise exploratória com SQL.
+A etapa de análise exploratória e analítica com SQL foi concluída.
 
 ### Concluído
 
@@ -408,14 +533,16 @@ O projeto encontra-se na etapa final da análise exploratória com SQL.
 * [x] Análise do perfil dos usuários;
 * [x] Análise semanal;
 * [x] Análise horária;
-* [x] Análise da duração das viagens.
+* [x] Análise da duração das viagens;
+* [x] Análise das estações;
+* [x] Análise das principais rotas;
+* [x] Consolidação dos principais insights.
 
-### Em andamento
+### Próximas etapas
 
-* [ ] Análise das estações;
-* [ ] Consolidação dos principais insights;
 * [ ] Desenvolvimento do dashboard no Power BI;
-* [ ] Revisão final da documentação.
+* [ ] Revisão final da documentação;
+* [ ] Publicação e apresentação dos resultados.
 
 ---
 
@@ -440,4 +567,4 @@ O projeto encontra-se na etapa final da análise exploratória com SQL.
 
 Dados históricos de viagens disponibilizados publicamente pela Divvy:
 
-[Divvy Trip Data — Dados históricos de viagens](https://divvy-tripdata.s3.amazonaws.com/index.html)
+[Divvy Trip Data](https://divvy-tripdata.s3.amazonaws.com/index.html)
