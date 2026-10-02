@@ -1,6 +1,6 @@
 -- ============================================================
--- 04_station_analysis.sql
--- Análise das estações
+-- 06_station_analysis.sql
+-- Análise das estações e rotas (Star Schema)
 -- ============================================================
 
 
@@ -32,6 +32,7 @@ SELECT
         2
     ) AS percentual_casual
 FROM trips
+WHERE start_station_name IS NOT NULL
 GROUP BY start_station_name
 ORDER BY COUNT(*) DESC
 LIMIT 10;
@@ -65,6 +66,7 @@ SELECT
         2
     ) AS percentual_casual
 FROM trips
+WHERE end_station_name IS NOT NULL
 GROUP BY end_station_name
 ORDER BY COUNT(*) DESC
 LIMIT 10;
@@ -87,6 +89,7 @@ SELECT
         2
     ) AS duracao_mediana_viagens
 FROM trips
+WHERE start_station_name IS NOT NULL
 GROUP BY start_station_name
 HAVING COUNT(*) >= 100
 ORDER BY duracao_media_viagens DESC
@@ -110,6 +113,7 @@ SELECT
         2
     ) AS duracao_mediana_viagens
 FROM trips
+WHERE start_station_name IS NOT NULL
 GROUP BY start_station_name
 HAVING COUNT(*) >= 100
 ORDER BY duracao_media_viagens ASC
@@ -122,36 +126,45 @@ LIMIT 10;
 
 WITH viagens_por_estacao AS (
     SELECT
-        day_of_week,
-        day_of_week_name,
-        member_casual,
-        start_station_name,
+        d.day_of_week_num AS dia_semana_num,
+        d.day_of_week_name AS nome_dia_semana,
+        t.member_casual,
+        t.start_station_name,
         COUNT(*) AS total_viagens,
         ROW_NUMBER() OVER (
             PARTITION BY
-                day_of_week,
-                member_casual
+                d.day_of_week_num,
+                t.member_casual
             ORDER BY COUNT(*) DESC
         ) AS posicao
-    FROM trips
-    WHERE start_station_name IS NOT NULL
+    FROM trips t
+    JOIN dim_calendar d
+      ON DATE_TRUNC('hour', t.started_at) = d.datetime_key
+    WHERE t.start_station_name IS NOT NULL
     GROUP BY
-        day_of_week,
-        day_of_week_name,
-        member_casual,
-        start_station_name
+        d.day_of_week_num,
+        d.day_of_week_name,
+        t.member_casual,
+        t.start_station_name
 )
 
 SELECT
-    day_of_week,
-    day_of_week_name,
+    dia_semana_num,
+    nome_dia_semana,
     member_casual,
     start_station_name,
-    total_viagens
+    REPLACE(
+        TO_CHAR(
+            total_viagens,
+            'FM999G999G999'
+        ),
+        ',',
+        '.'
+    ) AS total_viagens
 FROM viagens_por_estacao
 WHERE posicao = 1
 ORDER BY
-    day_of_week,
+    dia_semana_num,
     member_casual;
 
 
@@ -170,6 +183,8 @@ WITH rotas AS (
             ORDER BY COUNT(*) DESC
         ) AS posicao
     FROM trips
+    WHERE start_station_name IS NOT NULL
+      AND end_station_name IS NOT NULL
     GROUP BY
         member_casual,
         start_station_name,

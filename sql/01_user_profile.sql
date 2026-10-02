@@ -1,16 +1,22 @@
 -- ============================================================
 -- 01_user_profile.sql
--- Perfil geral e características dos usuários
+-- Perfil geral e características dos usuários (Star Schema)
 -- ============================================================
 
 
 -- ============================================================
 -- 1. Consulta inicial
--- Visualização de uma amostra dos registros
+-- Visualização de uma amostra dos registros das tabelas
 -- ============================================================
 
+-- Tabela de Fatos: Trips
 SELECT *
 FROM trips
+LIMIT 10;
+
+-- Tabela de Dimensão: Dim Calendar
+SELECT *
+FROM dim_calendar
 LIMIT 10;
 
 
@@ -21,14 +27,21 @@ LIMIT 10;
 
 SELECT
     member_casual,
-    COUNT(*) AS total_viagens,
+    REPLACE(
+        TO_CHAR(
+            COUNT(*),
+            'FM999G999G999'
+        ),
+        ',',
+        '.'
+    ) AS total_trips,
     ROUND(
         COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (),
         2
-    ) AS percentual_viagens
+    ) AS percentage_of_total
 FROM trips
 GROUP BY member_casual
-ORDER BY total_viagens DESC;
+ORDER BY COUNT(*) DESC;
 
 
 -- ============================================================
@@ -41,15 +54,15 @@ SELECT
     ROUND(
         AVG(ride_length),
         2
-    ) AS duracao_media_viagens,
+    ) AS avg_duration_minutes,
     ROUND(
         PERCENTILE_CONT(0.5)
         WITHIN GROUP (ORDER BY ride_length)::numeric,
         2
-    ) AS duracao_mediana_viagens
+    ) AS median_duration_minutes
 FROM trips
 GROUP BY member_casual
-ORDER BY duracao_media_viagens DESC;
+ORDER BY avg_duration_minutes DESC;
 
 
 -- ============================================================
@@ -59,15 +72,22 @@ ORDER BY duracao_media_viagens DESC;
 
 SELECT
     member_casual,
-
-    COUNT(*) FILTER (
-        WHERE rideable_type = 'electric_bike'
-    ) AS qtd_bicicletas_eletricas,
-
-    COUNT(*) FILTER (
-        WHERE rideable_type = 'classic_bike'
-    ) AS qtd_bicicletas_classicas
-
+    REPLACE(
+        TO_CHAR(
+            COUNT(*) FILTER (WHERE rideable_type = 'electric_bike'),
+            'FM999G999G999'
+        ),
+        ',',
+        '.'
+    ) AS electric_bike_trips,
+    REPLACE(
+        TO_CHAR(
+            COUNT(*) FILTER (WHERE rideable_type = 'classic_bike'),
+            'FM999G999G999'
+        ),
+        ',',
+        '.'
+    ) AS classic_bike_trips
 FROM trips
 GROUP BY member_casual
 ORDER BY member_casual;
@@ -80,21 +100,14 @@ ORDER BY member_casual;
 
 SELECT
     member_casual,
-
     ROUND(
-        COUNT(*) FILTER (
-            WHERE rideable_type = 'electric_bike'
-        ) * 100.0 / COUNT(*),
+        COUNT(*) FILTER (WHERE rideable_type = 'electric_bike') * 100.0 / COUNT(*),
         2
-    ) AS percentual_bicicletas_eletricas,
-
+    ) AS percentage_electric_bikes,
     ROUND(
-        COUNT(*) FILTER (
-            WHERE rideable_type = 'classic_bike'
-        ) * 100.0 / COUNT(*),
+        COUNT(*) FILTER (WHERE rideable_type = 'classic_bike') * 100.0 / COUNT(*),
         2
-    ) AS percentual_bicicletas_classicas
-
+    ) AS percentage_classic_bikes
 FROM trips
 GROUP BY member_casual
 ORDER BY member_casual;

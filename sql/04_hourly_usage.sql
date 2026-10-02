@@ -1,6 +1,6 @@
 -- ============================================================
--- 03_hourly_usage.sql
--- Análise da utilização ao longo do dia
+-- 04_hourly_usage.sql
+-- Análise da utilização ao longo do dia (Star Schema)
 -- ============================================================
 
 
@@ -9,7 +9,7 @@
 -- ============================================================
 
 SELECT
-    hour,
+    d.hour,
     REPLACE(
         TO_CHAR(
             COUNT(*),
@@ -17,10 +17,12 @@ SELECT
         ),
         ',',
         '.'
-    ) AS total_viagens
-FROM trips
-GROUP BY hour
-ORDER BY COUNT(*) DESC;
+    ) AS total_trips
+FROM trips t
+JOIN dim_calendar d
+  ON DATE_TRUNC('hour', t.started_at) = d.datetime_key
+GROUP BY d.hour
+ORDER BY d.hour;
 
 
 -- ============================================================
@@ -28,8 +30,8 @@ ORDER BY COUNT(*) DESC;
 -- ============================================================
 
 SELECT
-    member_casual,
-    hour,
+    t.member_casual,
+    d.hour,
     REPLACE(
         TO_CHAR(
             COUNT(*),
@@ -37,27 +39,31 @@ SELECT
         ),
         ',',
         '.'
-    ) AS total_viagens
-FROM trips
-GROUP BY member_casual, hour
-ORDER BY member_casual, COUNT(*) DESC;
+    ) AS total_trips
+FROM trips t
+JOIN dim_calendar d
+  ON DATE_TRUNC('hour', t.started_at) = d.datetime_key
+GROUP BY t.member_casual, d.hour
+ORDER BY t.member_casual, d.hour;
 
 
 -- ============================================================
 -- 3. Horário de maior utilização por tipo de usuário
 -- ============================================================
 
-WITH hora_tipo_usuario AS (
+WITH hourly_ranking AS (
     SELECT
-        member_casual,
-        hour,
-        COUNT(*) AS total_viagens,
+        t.member_casual,
+        d.hour,
+        COUNT(*) AS total_trips,
         ROW_NUMBER() OVER (
-            PARTITION BY member_casual
+            PARTITION BY t.member_casual
             ORDER BY COUNT(*) DESC
-        ) AS posicao
-    FROM trips
-    GROUP BY member_casual, hour
+        ) AS rank_position
+    FROM trips t
+    JOIN dim_calendar d
+      ON DATE_TRUNC('hour', t.started_at) = d.datetime_key
+    GROUP BY t.member_casual, d.hour
 )
 
 SELECT
@@ -65,14 +71,14 @@ SELECT
     hour,
     REPLACE(
         TO_CHAR(
-            total_viagens,
+            total_trips,
             'FM999G999G999'
         ),
         ',',
         '.'
-    ) AS total_viagens
-FROM hora_tipo_usuario
-WHERE posicao = 1
+    ) AS total_trips
+FROM hourly_ranking
+WHERE rank_position = 1
 ORDER BY member_casual;
 
 
@@ -81,13 +87,8 @@ ORDER BY member_casual;
 -- ============================================================
 
 SELECT
-    member_casual,
-    CASE
-        WHEN hour BETWEEN 0 AND 4 THEN 'Madrugada'
-        WHEN hour BETWEEN 5 AND 11 THEN 'Manhã'
-        WHEN hour BETWEEN 12 AND 17 THEN 'Tarde'
-        ELSE 'Noite'
-    END AS periodo_dia,
+    t.member_casual,
+    d.time_of_day,
     REPLACE(
         TO_CHAR(
             COUNT(*),
@@ -95,10 +96,12 @@ SELECT
         ),
         ',',
         '.'
-    ) AS total_viagens
-FROM trips
-GROUP BY member_casual, periodo_dia
-ORDER BY COUNT(*) DESC;
+    ) AS total_trips
+FROM trips t
+JOIN dim_calendar d
+  ON DATE_TRUNC('hour', t.started_at) = d.datetime_key
+GROUP BY t.member_casual, d.time_of_day
+ORDER BY t.member_casual, COUNT(*) DESC;
 
 
 -- ============================================================
@@ -106,19 +109,22 @@ ORDER BY COUNT(*) DESC;
 -- ============================================================
 
 SELECT
-    member_casual,
+    t.member_casual,
     CASE
-        WHEN day_of_week IN (1, 7)
-            THEN 'Final de semana'
-        ELSE 'Dia útil'
-    END AS tipo_dia,
-    CASE
-        WHEN hour BETWEEN 0 AND 4 THEN 'Madrugada'
-        WHEN hour BETWEEN 5 AND 11 THEN 'Manhã'
-        WHEN hour BETWEEN 12 AND 17 THEN 'Tarde'
-        ELSE 'Noite'
-    END AS periodo_dia,
-    COUNT(*) AS total_viagens
-FROM trips
-GROUP BY member_casual, tipo_dia, periodo_dia
-ORDER BY member_casual, tipo_dia, total_viagens DESC;
+        WHEN d.is_weekend THEN 'Weekend'
+        ELSE 'Weekday'
+    END AS day_type,
+    d.time_of_day,
+    REPLACE(
+        TO_CHAR(
+            COUNT(*),
+            'FM999G999G999'
+        ),
+        ',',
+        '.'
+    ) AS total_trips
+FROM trips t
+JOIN dim_calendar d
+  ON DATE_TRUNC('hour', t.started_at) = d.datetime_key
+GROUP BY t.member_casual, d.is_weekend, d.time_of_day
+ORDER BY t.member_casual, day_type, COUNT(*) DESC;

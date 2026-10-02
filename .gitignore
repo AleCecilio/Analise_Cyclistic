@@ -17,3 +17,6 @@ data/processed/
 
 # Conexão com o Banco de Dados
 .env
+
+# dashbord até ficar pronto
+dashbord/
