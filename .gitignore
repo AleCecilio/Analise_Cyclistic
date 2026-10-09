@@ -20,3 +20,7 @@ data/processed/
 
 # dashbord até ficar pronto
 dashbord/
+
+# elementos usados no dashbord 
+# como são eclusivamente elementos de gráficos optei por não versionar
+dashbord/graphic_elements/
