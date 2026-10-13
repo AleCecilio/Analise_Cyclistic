@@ -265,11 +265,12 @@ A composição das estações de maior volume é bastante desigual entre os grup
 - Entre as estações com mais de 100 viagens, a maior duração média é de Cumberland Ave & Catherine Ave (65,18 min; mediana de 34,28 min) e a menor é de Public Rack - Pulaski Rd & 44th St (4,26 min). A diferença entre média e mediana indica distribuições assimétricas.
 
 <p align="center">
-  <a href="dashbord/prints/Captura_de_tela_2026-10-13_095254.png">
-    <img src="dashbord/prints/Captura_de_tela_2026-10-13_095254.png" alt="Dashboard Power BI, perfil de deslocamento físico, com o mapa em modo Origem" width="100%">
+  <a href="dashbord/prints/Captura%20de%20tela%202026-10-13%20095254.png">
+    <img src="dashbord/prints/Captura%20de%20tela%202026-10-13%20095254.png" alt="Dashboard Power BI, perfil de deslocamento físico, com o mapa em modo Origem" width="100%">
   </a>
 </p>
 <p align="center"><sub>Perfil de deslocamento físico: tipo de bicicleta, rotas mais utilizadas e estações com mais viagens (modo Origem).</sub></p>
+
 
 ### Rotas
 
