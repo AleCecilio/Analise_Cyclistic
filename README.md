@@ -215,14 +215,12 @@ As 17h são o horário de maior uso nos dois grupos (member: 417.885 viagens; ca
 | Noite | 986.150 | 594.890 |
 | Madrugada | 88.910 | 110.824 |
 
-```html
 <p align="center">
   <a href="dashbord/prints/Captura%20de%20tela%202026-10-13%20095309.png">
     <img src="dashbord/prints/Captura%20de%20tela%202026-10-13%20095309.png" alt="Dashboard Power BI, perfil temporal e comportamental: duração média por mês, proporção de usuários, viagens por dia da semana e por hora" width="100%">
   </a>
 </p>
 <p align="center"><sub>Perfil temporal e comportamental: a curva horária de member mostra picos pela manhã e às 17h; os fins de semana aproximam os dois grupos.</sub></p>
-```
 
 ### Duração das viagens
 
@@ -309,14 +307,13 @@ A demonstração abaixo mostra a página 2 com filtros aplicados: ao selecionar 
 
 O modo Destino do mapa:
 
-```html
 <p align="center">
   <a href="dashbord/prints/Captura%20de%20tela%202026-10-13%20095239.png">
     <img src="dashbord/prints/Captura%20de%20tela%202026-10-13%20095239.png" alt="Dashboard Power BI, perfil de deslocamento físico, com o mapa em modo Destino" width="100%">
   </a>
 </p>
 <p align="center"><sub>Estações com mais viagens, modo Destino.</sub></p>
-```
+
 
 ---
 
