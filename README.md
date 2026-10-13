@@ -125,12 +125,12 @@ Analise_Cyclistic/
 │   ├── 04_hourly_usage.sql
 │   ├── 05_ride_duration.sql
 │   └── 06_station_analysis.sql
-├── powerbi/
-│   └── cyclistic_dashboard.pbix
 ├── dashbord/
 │   ├── grafich_elements/       # elementos gráficos do dashboard
 │   ├── prints/                 # capturas de tela
-│   └── gifs/                   # demonstrações de interação
+│   ├── gifs/                   # demonstrações de interação
+│   └── powerbi/
+│        └── cyclistic_dashboard.pbix
 ├── README.md
 ├── requirements.txt
 └── .gitignore
@@ -216,8 +216,8 @@ As 17h são o horário de maior uso nos dois grupos (member: 417.885 viagens; ca
 | Madrugada | 88.910 | 110.824 |
 
 <p align="center">
-  <a href="dashbord/prints/Captura_de_tela_2026-10-13_095309.png">
-    <img src="dashbord/prints/Captura_de_tela_2026-10-13_095309.png" alt="Dashboard Power BI, perfil temporal e comportamental: duração média por mês, proporção de usuários, viagens por dia da semana e por hora" width="100%">
+  <a href="dashbord\prints\Captura_de_tela_2026-10-13_095309.png">
+    <img src="dashbord\prints\Captura_de_tela_2026-10-13_095309.png" alt="Dashboard Power BI, perfil temporal e comportamental: duração média por mês, proporção de usuários, viagens por dia da semana e por hora" width="100%">
   </a>
 </p>
 <p align="center"><sub>Perfil temporal e comportamental: a curva horária de member mostra picos pela manhã e às 17h; os fins de semana aproximam os dois grupos.</sub></p>
@@ -308,8 +308,8 @@ A demonstração abaixo mostra a página 2 com filtros aplicados: ao selecionar 
 O modo Destino do mapa:
 
 <p align="center">
-  <a href="dashbord/prints/Captura_de_tela_2026-10-13_095239.png">
-    <img src="dashbord/prints/Captura_de_tela_2026-10-13_095239.png" alt="Dashboard Power BI, perfil de deslocamento físico, com o mapa em modo Destino" width="100%">
+  <a href="dashbord\prints\Captura_de_tela_2026-10-13_095239.png">
+    <img src="dashbord\prints\Captura_de_tela_2026-10-13_095239.png" alt="Dashboard Power BI, perfil de deslocamento físico, com o mapa em modo Destino" width="100%">
   </a>
 </p>
 <p align="center"><sub>Estações com mais viagens, modo Destino.</sub></p>
