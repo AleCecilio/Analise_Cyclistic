@@ -1,570 +1,387 @@
-# Analise_Cyclistic
+# Cyclistic: Análise do Uso de Bicicletas Compartilhadas
+
+### Members vs. Casuals: como membros anuais e usuários ocasionais utilizam o sistema Divvy
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
+![SciPy](https://img.shields.io/badge/SciPy-8CAAE6?style=for-the-badge&logo=scipy&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=for-the-badge)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
+![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=for-the-badge&logo=jupyter&logoColor=white)
+
+![Status](https://img.shields.io/badge/status-conclu%C3%ADdo-blue?style=for-the-badge)
+![Tipo](https://img.shields.io/badge/tipo-portf%C3%B3lio-blueviolet?style=for-the-badge)
+
+[![Dashboard online](https://img.shields.io/badge/Dashboard-Power_BI_Web-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)](https://app.powerbi.com/view?r=eyJrIjoiMTkyMTQ1MDQtNDZmMS00MDAwLTk4OTQtNGQ0ZDBmZjA3NmE5IiwidCI6IjU1ZWRkMDA3LTY2ZTItNDllOS1iZWM3LWU1YWIxYzFiYWMyNiJ9)
+
+---
 
 ## Sobre o Projeto
 
-Este projeto apresenta uma análise de dados baseada no estudo de caso da **Cyclistic**, empresa fictícia utilizada no curso **Google Data Analytics**.
+Este projeto analisa 12 meses de viagens do sistema de bicicletas compartilhadas Divvy (Chicago), com base no estudo de caso Cyclistic do curso Google Data Analytics, para responder a uma pergunta: **como os membros anuais (`member`) e os usuários ocasionais (`casual`) utilizam as bicicletas de maneira diferente?**
 
-São utilizados dados históricos do sistema de compartilhamento de bicicletas **Divvy**, de Chicago, Illinois, com o objetivo de identificar padrões de utilização e diferenças de comportamento entre **members** e **casuals**.
+O trabalho percorre o ciclo completo de análise: consolidação e limpeza dos dados em Python, modelagem e consultas em PostgreSQL e um dashboard interativo no Power BI. Foram analisadas 5.951.477 viagens, de setembro de 2025 a agosto de 2026. O README também reúne os principais números, gráficos e conclusões da análise.
 
-O projeto percorre um fluxo completo de análise de dados, desde a exploração e preparação dos dados até a análise com SQL e posterior visualização no Power BI.
+<p align="center">
+  <a href="dashbord/gifs/dashbord_temporal_tela1.gif">
+    <img src="dashbord/gifs/dashbord_temporal_tela1.gif" alt="Dashboard Power BI: perfil temporal e comportamental, com painel de filtros" width="85%">
+  </a>
+</p>
+<p align="center"><sub>Dashboard Power BI, página 1: perfil temporal e comportamental.</sub></p>
+
+---
+
+## Objetivos
+
+| Etapa | Descrição | Status |
+| --- | --- | --- |
+| Exploração | Estrutura, tipos e consistência dos 12 arquivos mensais | Concluído |
+| Limpeza | Ausências, duplicatas, inconsistências temporais e valores extremos | Concluído |
+| Variáveis derivadas | Duração da viagem (`ride_length`) e dimensão de calendário (`dim_calendar`) | Concluído |
+| Modelagem | Carga no PostgreSQL (`trips` e `dim_calendar`) | Concluído |
+| Análise SQL | Perfil, uso mensal, semanal e horário, duração e estações | Concluído |
+| Dashboard | Dashboard interativo no Power BI (2 páginas) | Concluído |
+
+---
+
+## Sumário
+
+- [Fluxo do projeto](#fluxo-do-projeto)
+- [Dados](#dados)
+- [Tecnologias](#tecnologias)
+- [Estrutura do repositório](#estrutura-do-repositório)
+- [Processo analítico](#processo-analítico)
+- [Principais resultados](#principais-resultados)
+- [Dashboard](#dashboard)
+- [Conclusões gerais](#conclusões-gerais)
+- [Limitações](#limitações)
+- [Como executar](#como-executar)
+- [Possíveis melhorias](#possíveis-melhorias)
+- [Autor](#autor)
+
+---
+
+## Fluxo do projeto
 
 ```text
-Dados brutos
-    ↓
-Python + Pandas
-    ↓
-Exploração e limpeza
-    ↓
-Dataset processado
-    ↓
-PostgreSQL
-    ↓
-Análise com SQL
-    ↓
-Power BI
+Arquivos mensais (CSV)  ->  Python/Pandas  ->  Exploração e limpeza  ->  CSV processado
+                                                                              |
+                         Power BI  <-  Consultas SQL  <-  PostgreSQL (trips + dim_calendar)
 ```
-
----
-
-## Objetivo
-
-O objetivo é analisar como os diferentes tipos de usuários utilizam o serviço e identificar diferenças relacionadas a:
-
-* frequência de utilização;
-* dias da semana;
-* horários;
-* duração das viagens;
-* tipo de bicicleta;
-* estações de origem e destino;
-* rotas mais utilizadas.
-
-A análise busca verificar se **members e casuals apresentam padrões de utilização distintos**, utilizando diferentes dimensões dos dados para sustentar essa investigação.
-
----
 
 ## Dados
 
-Os dados utilizados são provenientes do **Divvy Trip Data**, disponibilizado publicamente pela Divvy.
+**Fonte:** [Divvy Trip Data](https://divvy-tripdata.s3.amazonaws.com/index.html), dados públicos de viagens do Divvy. O arquivo de cada mês segue o padrão `YYYYMM-divvy-tripdata.csv`.
 
-### Período analisado
+**Período:** setembro de 2025 a agosto de 2026 (12 arquivos mensais, 13 colunas cada).
 
-Foram utilizados 12 meses de dados:
+**Variáveis originais:** `ride_id`, `rideable_type`, `started_at`, `ended_at`, `start_station_name`, `start_station_id`, `end_station_name`, `end_station_id`, `start_lat`, `start_lng`, `end_lat`, `end_lng` e `member_casual`.
 
-**Setembro de 2025 a agosto de 2026.**
+**Variáveis criadas:**
 
-Os arquivos mensais foram consolidados com Python e Pandas em:
+| Variável | Origem | Descrição |
+| --- | --- | --- |
+| `ride_length` | Notebook 02 | Duração da viagem em minutos |
+| `dim_calendar` | `sql/00_create_dim_calendar.sql` | Tabela de dimensão horária com data, hora, ano, mês, dia da semana e indicador de fim de semana |
 
-```text
-cyclistic_202509_202608.csv
-```
+**Volume de registros ao longo do tratamento:**
 
-Após o tratamento, o dataset processado é salvo como:
+| Etapa | Registros |
+| --- | ---: |
+| Dados brutos consolidados | 6.115.982 |
+| Após remover ausências irrecuperáveis (5.426) | 6.110.556 |
+| Após remover duplicatas completas (29) | 6.110.527 |
+| Após remover viagens acima de 24 h (174) e de até 1 min (158.876) | **5.951.477** |
 
-```text
-cyclistic_202509_202608_processed.csv
-```
+## Tecnologias
 
-### Principais variáveis
+| Ferramenta | Uso no projeto |
+| --- | --- |
+| Python, Pandas, NumPy | Consolidação, limpeza e criação de variáveis |
+| SciPy (`cKDTree`) | Busca da estação mais próxima para recuperar identificação de estações ausentes |
+| Sweetviz, Matplotlib, Seaborn | Perfil inicial dos dados e auditoria de valores ausentes e outliers |
+| SQLAlchemy, psycopg2, python-dotenv | Conexão com o PostgreSQL e carga com `COPY`; credenciais lidas do `.env` |
+| PostgreSQL | Armazenamento (`trips`, `dim_calendar`) e análise em SQL |
+| Power BI | Dashboard interativo em duas páginas |
 
-Os dados originais contêm informações como:
-
-* `ride_id` — identificador da viagem;
-* `rideable_type` — tipo de bicicleta;
-* `started_at` — início da viagem;
-* `ended_at` — término da viagem;
-* `start_station_name` — estação de origem;
-* `start_station_id` — identificador da estação de origem;
-* `end_station_name` — estação de destino;
-* `end_station_id` — identificador da estação de destino;
-* `start_lat` / `start_lng` — coordenadas de origem;
-* `end_lat` / `end_lng` — coordenadas de destino;
-* `member_casual` — tipo de usuário.
-
-Durante o tratamento foram criadas:
-
-* `ride_length` — duração da viagem em minutos;
-* `day_of_week` — número correspondente ao dia da semana;
-* `day_of_week_name` — nome do dia da semana;
-* `hour` — hora de início da viagem.
-
----
-
-## Estrutura do Projeto
+## Estrutura do repositório
 
 ```text
 Analise_Cyclistic/
-
-│
-├── data/
-│   ├── raw/
-│   ├── raw_zip/
-│   └── processed/
-│
+├── data/                       # não versionado
+│   ├── raw/                    # CSVs mensais originais
+│   ├── raw_zip/                # arquivos compactados baixados
+│   └── processed/              # dataset consolidado e dataset tratado
 ├── notebooks/
 │   ├── 01_initial_exploration.ipynb
 │   └── 02_data_cleaning.ipynb
-│
 ├── sql/
+│   ├── 00_create_dim_calendar.sql
 │   ├── 01_user_profile.sql
-│   ├── 02_weekly_usage.sql
-│   ├── 03_hourly_usage.sql
-│   ├── 04_ride_duration.sql
-│   └── 05_station_analysis.sql
-│
+│   ├── 02_monthly_usage.sql
+│   ├── 03_weekly_usage.sql
+│   ├── 04_hourly_usage.sql
+│   ├── 05_ride_duration.sql
+│   └── 06_station_analysis.sql
 ├── powerbi/
 │   └── cyclistic_dashboard.pbix
-│
-├── .venv/
-├── .env
+├── dashbord/
+│   ├── grafich_elements/       # elementos gráficos do dashboard
+│   ├── prints/                 # capturas de tela
+│   └── gifs/                   # demonstrações de interação
 ├── README.md
 ├── requirements.txt
 └── .gitignore
 ```
 
-Os arquivos de dados e o `.env` são mantidos localmente e não são versionados no GitHub.
+Os dados e o arquivo `.env` ficam apenas no ambiente local e não são versionados.
 
----
+## Processo analítico
 
-## Metodologia
+### 1. Exploração inicial (`01_initial_exploration.ipynb`)
 
-### 1. Exploração inicial
+- Carga dos 12 arquivos mensais em um dicionário de DataFrames.
+- Verificação de número de linhas e colunas, nomes e tipos de variáveis em cada arquivo.
+- Confirmação de que todos os arquivos têm as mesmas colunas e os mesmos tipos.
+- Concatenação em um único DataFrame (6.115.982 linhas) e conferência da soma dos registros mensais contra o total consolidado.
+- Gravação de `cyclistic_202509_202608.csv`.
 
-A exploração foi realizada em Python utilizando Pandas, Jupyter Notebook e Sweetviz.
+### 2. Limpeza e preparação (`02_data_cleaning.ipynb`)
 
-Foram analisados:
+| Problema | Diagnóstico | Decisão |
+| --- | --- | --- |
+| Ausência de estação e coordenadas | `end_station_*` com 1.349.937 ausências; `end_lat`/`end_lng` com 5.426, todas contidas nas ausências de estação de destino. Nome e ID de cada estação ausentes nos mesmos registros | Imputação da estação a partir das coordenadas, com a estação de referência mais próxima (`cKDTree`) |
+| Chave da estação | Um mesmo nome aparece com várias coordenadas e, em alguns casos, com mais de um ID | `station_id` adotado como chave; coordenada de referência definida como a coordenada START mais frequente de cada ID. Validação contra a coordenada END mais frequente: concordância em 1.977 de 1.980 IDs (99,85%) |
+| Ausências remanescentes | 5.426 registros (0,09%) sem recuperação confiável | Removidos |
+| Duplicatas | 29 registros totalmente duplicados | Removidos |
+| `ended_at` anterior a `started_at` | 29 registros, todos em 02/11/2025 às 01h, no fim do horário de verão em Chicago | Mantidos, com 1 hora somada a `ride_length` |
+| Viagens acima de 24 h | 174 registros (0,0028%) | Removidas |
+| Viagens de até 1 minuto | 158.876 registros (2,60%); 81,83% começam e terminam na mesma estação, sem concentração em uma estação específica | Removidas (limite mínimo operacional) |
+| Outliers pelo critério IQR | 423.123 registros (6,92%) acima de 32,34 min, em distribuição assimétrica | Mantidos: duração elevada pode ser comportamento real |
+| Viagens com mesma estação de início e fim | 393.328 registros | Mantidos |
 
-* estrutura dos arquivos mensais;
-* quantidade de registros;
-* tipos de dados;
-* variáveis disponíveis;
-* valores ausentes;
-* duplicidades;
-* consistência dos dados;
-* diferenças entre os arquivos mensais.
+Também foram verificadas as variáveis categóricas (`member_casual` e `rideable_type` sem valores inesperados) e as coordenadas (nenhum valor fora do intervalo válido nem igual a zero). O dataset final foi revalidado quanto a inconsistências, duplicatas, ausências e duração, e salvo como `cyclistic_202509_202608_processed.csv`.
 
-Os arquivos foram posteriormente consolidados em um único dataset.
+### 3. Carga e modelagem no PostgreSQL
 
-### 2. Limpeza e preparação
+- O notebook 02 cria o banco (se não existir) e a tabela `trips` com 14 colunas, e carrega o CSV tratado com `COPY`. A contagem na tabela confere com o dataset: 5.951.477 registros.
+- `sql/00_create_dim_calendar.sql` cria `dim_calendar`, dimensão horária de 2025-09-01 a 2026-08-31, com chave `datetime_key`. As consultas ligam `trips` à dimensão por `DATE_TRUNC('hour', started_at)`, em um esquema estrela simples (fato e dimensão).
 
-O processo de tratamento incluiu:
+### 4. Consultas SQL
 
-* tratamento de valores ausentes;
-* identificação de registros duplicados;
-* conversão das variáveis temporais;
-* verificação de inconsistências;
-* criação de variáveis derivadas;
-* tratamento da duração das viagens;
-* análise de valores atípicos;
-* validação do dataset final.
+| Arquivo | Análise |
+| --- | --- |
+| `01_user_profile.sql` | Distribuição por tipo de usuário, duração média e mediana, tipo de bicicleta |
+| `02_monthly_usage.sql` | Volume mensal, distribuição mensal por grupo, mês de pico, duração por mês e análise por estação do ano |
+| `03_weekly_usage.sql` | Viagens por dia da semana, dia útil vs. fim de semana, dia de pico, média diária por dia da semana |
+| `04_hourly_usage.sql` | Viagens por hora, hora de pico, distribuição por período do dia e tipo de dia |
+| `05_ride_duration.sql` | Duração média e mediana por dia, hora, período e grupo; distribuição por faixa de duração |
+| `06_station_analysis.sql` | Estações e rotas distintas, principais estações de origem e destino, duração por estação, estação líder por dia, rotas mais usadas por grupo |
 
-#### Inconsistências temporais
+Recursos utilizados: CTEs, funções de janela (`ROW_NUMBER`, `SUM() OVER`), `FILTER`, `PERCENTILE_CONT` para a mediana, `JOIN` com a dimensão, `CASE` e `HAVING`. Para durações por estação, foram consideradas apenas estações com pelo menos 100 viagens.
 
-Foram identificados 29 registros em que `ended_at` apresentava horário anterior a `started_at`.
+## Principais resultados
 
-Os registros estavam concentrados em **2 de novembro de 2025**, durante a transição do horário de verão em Chicago. A ocorrência foi considerada no cálculo da duração para evitar valores negativos.
+### Volume e tipo de bicicleta
 
-#### Duração das viagens
+`member` responde por 3.870.643 viagens (65,04%) e `casual` por 2.080.834 (34,96%). Bicicletas elétricas predominam nos dois grupos, com participação um pouco maior entre `casual`.
 
-Foram removidas viagens com:
+| Grupo | Elétricas | Clássicas | % elétricas |
+| --- | ---: | ---: | ---: |
+| casual | 1.514.975 | 565.859 | 72,81% |
+| member | 2.608.278 | 1.262.365 | 67,39% |
 
-```text
-ride_length <= 1 minuto
-```
+### Padrão semanal
 
-e:
+O sábado concentra a maior parte das viagens no conjunto (15,62%). `member` tem seu pico na quarta-feira e `casual` no sábado.
 
-```text
-ride_length > 1440 minutos
-```
+| Grupo | Dias úteis | Fins de semana | % em dias úteis |
+| --- | ---: | ---: | ---: |
+| member | 2.968.134 | 902.509 | 76,68% |
+| casual | 1.307.763 | 773.071 | 62,85% |
 
-O limite superior corresponde a 24 horas.
+> **Achado-chave:** `member` concentra 76,68% das viagens em dias úteis, contra 62,85% de `casual`. O uso de `casual` é proporcionalmente maior nos fins de semana.
 
-Valores classificados como outliers pelo IQR não foram removidos automaticamente, considerando a assimetria da distribuição e a possibilidade de representarem viagens legítimas.
+### Padrão horário
 
----
+As 17h são o horário de maior uso nos dois grupos (member: 417.885 viagens; casual: 197.592). Na distribuição por período, `member` concentra mais viagens na manhã que `casual` em termos relativos; `casual` tem participação maior à noite e na madrugada.
 
-## PostgreSQL
+| Período | Member | Casual |
+| --- | ---: | ---: |
+| Tarde | 1.643.820 | 941.247 |
+| Manhã | 1.151.763 | 433.873 |
+| Noite | 986.150 | 594.890 |
+| Madrugada | 88.910 | 110.824 |
 
-O dataset processado é carregado no **PostgreSQL**, onde é armazenado na tabela:
-
-```text
-trips
-```
-
-O banco é utilizado como ambiente para a etapa analítica, permitindo realizar consultas sobre o dataset tratado.
-
-Entre os recursos utilizados estão:
-
-* agregações;
-* `GROUP BY`;
-* `CASE`;
-* `FILTER`;
-* `WITH`;
-* funções de janela;
-* `ROW_NUMBER()`;
-* `PERCENTILE_CONT()`;
-* `JOIN`;
-* ordenação e filtragem.
-
----
-
-## Análise SQL
-
-As consultas foram organizadas por tema:
-
-| Arquivo                   | Análise                               |
-| ------------------------- | ------------------------------------- |
-| `01_user_profile.sql`     | Perfil e características dos usuários |
-| `02_weekly_usage.sql`     | Utilização ao longo da semana         |
-| `03_hourly_usage.sql`     | Utilização ao longo do dia            |
-| `04_ride_duration.sql`    | Duração das viagens                   |
-| `05_station_analysis.sql` | Estações, origens, destinos e rotas   |
-
-### Perfil dos usuários
-
-São analisados:
-
-* distribuição entre `members` e `casuals`;
-* duração média e mediana;
-* tipos de bicicleta utilizados;
-* participação relativa de cada tipo de bicicleta.
-
-### Utilização semanal
-
-A análise considera:
-
-* quantidade de viagens por dia;
-* comparação entre dias úteis e finais de semana;
-* comportamento de cada tipo de usuário;
-* dia de maior utilização.
-
-### Utilização horária
-
-São analisados:
-
-* volume de viagens por hora;
-* comportamento horário de cada grupo;
-* horário de maior utilização;
-* distribuição por período do dia;
-* relação entre período, tipo de dia e tipo de usuário.
+<p align="center">
+  <a href="dashbord/prints/Captura_de_tela_2026-10-13_095309.png">
+    <img src="dashbord/prints/Captura_de_tela_2026-10-13_095309.png" alt="Dashboard Power BI, perfil temporal e comportamental: duração média por mês, proporção de usuários, viagens por dia da semana e por hora" width="100%">
+  </a>
+</p>
+<p align="center"><sub>Perfil temporal e comportamental: a curva horária de member mostra picos pela manhã e às 17h; os fins de semana aproximam os dois grupos.</sub></p>
 
 ### Duração das viagens
 
-A análise considera:
+A duração média geral é de 14 min 22 s (14,37 min). `casual` tem duração média maior que `member` em todos os dias e períodos analisados, e varia mais entre os dias.
 
-* duração média e mediana por dia da semana;
-* duração por hora;
-* duração por período do dia;
-* duração por dia e tipo de usuário;
-* duração por período e tipo de usuário;
-* duração por dia, hora e tipo de usuário;
-* distribuição das viagens por faixas de duração.
+| Grupo | Maior média por dia | Menor média por dia |
+| --- | --- | --- |
+| casual | Domingo: 21,22 min | Quarta-feira: 15,25 min |
+| member | Sábado: 13,46 min | Quarta-feira: 11,69 min |
+
+No gráfico de duração média por mês do dashboard, a linha de `casual` fica acima da de `member` em todos os meses e oscila bem mais ao longo do ano.
+
+A distribuição por faixa mostra que `member` concentra mais viagens curtas e `casual` tem cauda mais longa:
+
+| Faixa | Casual | Member |
+| --- | ---: | ---: |
+| Até 10 min | 44,28% | 57,03% |
+| 11 a 20 min | 30,38% | 28,76% |
+| 21 a 30 min | 11,72% | 8,77% |
+| 31 a 60 min | 9,62% | 4,79% |
+| 61 a 120 min | 3,17% | 0,47% |
+| Mais de 120 min | 0,83% | 0,19% |
+
+> **Achado-chave:** 57,03% das viagens de `member` duram até 10 minutos, contra 44,28% de `casual`. Acima de 30 minutos, a participação de `casual` é de 13,62% e a de `member`, 5,45%.
 
 ### Estações
 
-A análise de estações considera:
+A composição das estações de maior volume é bastante desigual entre os grupos:
 
-* principais estações de origem;
-* principais estações de destino;
-* composição das estações por tipo de usuário;
-* estações mais utilizadas por dia da semana e tipo de usuário;
-* estações associadas às maiores e menores durações médias;
-* rotas mais utilizadas por tipo de usuário.
+| Estação de início | Viagens | Member | Casual |
+| --- | ---: | ---: | ---: |
+| Navy Pier | 66.991 | 24,07% | 75,93% |
+| Canal St & Adams St | 61.279 | 77,25% | 22,75% |
+| DuSable Lake Shore Dr & Monroe St | 56.235 | 27,94% | 72,06% |
+| Dearborn Pkwy & Delaware Pl | 55.111 | 70,65% | 29,35% |
+| Kingsbury St & Kinzie St 2 | 46.625 | 76,35% | 23,65% |
 
----
+> **Achado-chave:** entre as viagens que começam em Navy Pier, 75,93% são de `casual`; em Canal St & Adams St, 77,25% são de `member`. As estações de maior volume são, em geral, dominadas por um dos grupos.
 
-# Principais Resultados
+- Navy Pier é a principal estação de início de `casual` em todos os dias da semana (13.299 viagens no sábado, maior valor da análise) e também a principal estação de destino (66.720 viagens, 78,05% casual).
+- Entre `member`, Canal St & Adams St lidera de segunda a quinta; Dearborn Pkwy & Delaware Pl lidera de sexta a domingo.
+- Entre as estações com mais de 100 viagens, a maior duração média é de Cumberland Ave & Catherine Ave (65,18 min; mediana de 34,28 min) e a menor é de Public Rack - Pulaski Rd & 44th St (4,26 min). A diferença entre média e mediana indica distribuições assimétricas.
 
-A análise dos 12 meses de dados identificou diferenças entre `members` e `casuals` em relação à distribuição semanal, horários, duração das viagens, tipo de bicicleta e utilização das estações.
+<p align="center">
+  <a href="dashbord/prints/Captura_de_tela_2026-10-13_095254.png">
+    <img src="dashbord/prints/Captura_de_tela_2026-10-13_095254.png" alt="Dashboard Power BI, perfil de deslocamento físico, com o mapa em modo Origem" width="100%">
+  </a>
+</p>
+<p align="center"><sub>Perfil de deslocamento físico: tipo de bicicleta, rotas mais utilizadas e estações com mais viagens (modo Origem).</sub></p>
 
-## Perfil dos usuários
+### Rotas
 
-A distribuição geral das viagens mostra maior volume de viagens realizadas por `members` do que por `casuals`.
+| Grupo | Rotas de maior volume |
+| --- | --- |
+| casual | Navy Pier -> Navy Pier (9.482); DuSable Lake Shore Dr & Monroe St -> mesma estação (8.148); DuSable Lake Shore Dr & Monroe St -> Navy Pier (5.212); Michigan Ave & Oak St -> mesma estação (3.509) |
+| member | Blackstone Ave & 59th St -> University Ave & 57th St (3.421); University Ave & 57th St -> mesma estação (3.362); University Ave & 57th St -> Blackstone Ave & 59th St (3.232); Ellis Ave & 60th St -> University Ave & 57th St (3.194) |
 
-Além da quantidade de viagens, também foi analisada a utilização dos diferentes tipos de bicicleta.
-
-### Tipo de bicicleta
-
-As bicicletas elétricas apresentam maior volume de utilização do que as bicicletas clássicas nos dois grupos.
-
-| Tipo de usuário | Elétricas | Clássicas |
-| --------------- | --------: | --------: |
-| Casuals         | 1.514.975 |   565.859 |
-| Members         | 2.608.278 | 1.262.365 |
-
-Entre os `casuals`, foram registradas **1.514.975 viagens com bicicletas elétricas** e **565.859 com bicicletas clássicas**.
-
-Entre os `members`, foram registradas **2.608.278 viagens com bicicletas elétricas** e **1.262.365 com bicicletas clássicas**.
-
-Portanto, as bicicletas elétricas representam o maior volume de utilização nos dois grupos.
+As rotas de `casual` concentram-se em Navy Pier e DuSable Lake Shore Dr, com muitas viagens de origem e destino iguais. As de `member` envolvem sobretudo deslocamentos entre estações distintas na região de University Ave, Blackstone Ave e Ellis Ave.
 
 ---
 
-## Utilização ao longo da semana
+## Dashboard
 
-No conjunto dos dados, o sábado apresenta a maior participação das viagens, com **15,62%**, enquanto o domingo apresenta **12,53%**.
+O dashboard está publicado no [Power BI Web](https://app.powerbi.com/view?r=eyJrIjoiMTkyMTQ1MDQtNDZmMS00MDAwLTk4OTQtNGQ0ZDBmZjA3NmE5IiwidCI6IjU1ZWRkMDA3LTY2ZTItNDllOS1iZWM3LWU1YWIxYzFiYWMyNiJ9) e o arquivo-fonte está em `powerbi/cyclistic_dashboard.pbix`. Ele tem duas páginas, ambas com painel de filtros (ícone de funil) e botão para limpar filtros. Os visuais são recalculados conforme os filtros aplicados.
 
-Separando os grupos:
+**Página 1: Perfil Temporal e Comportamental**
+- Indicadores: total de viagens e duração média.
+- Visuais: duração média por mês, proporção casual vs. member, viagens por dia da semana e viagens por hora, cada um com a separação por tipo de usuário.
+- Filtros: tipo de usuário, ano e mês.
 
-| Tipo de usuário | Dias úteis | Finais de semana |
-| --------------- | ---------: | ---------------: |
-| Members         |  2.968.134 |          902.509 |
-| Casuals         |  1.307.763 |          773.071 |
+**Página 2: Perfil de Deslocamento Físico**
+- Indicadores: total de viagens, total de estações (cerca de 2 mil), total de rotas (cerca de 350 mil) e rota mais utilizada (Navy Pier -> Navy Pier, cerca de 10 mil viagens).
+- Visuais: bicicletas elétricas vs. clássicas, rotas mais utilizadas por tipo de usuário e mapa das estações com mais viagens, com alternância entre Origem e Destino.
+- Filtros: tipo de usuário, tipo de bicicleta e estação.
 
-O maior volume de viagens dos `members` ocorre na **quarta-feira**, enquanto o dos `casuals` ocorre no **sábado**.
+A demonstração abaixo mostra a página 2 com filtros aplicados: ao selecionar `member`, os indicadores, o gráfico de bicicletas, as rotas e o mapa são recalculados.
 
-Esse resultado mostra uma diferença na distribuição semanal dos grupos: os `members` apresentam maior concentração de viagens nos dias úteis, enquanto os `casuals` possuem participação relativamente maior nos finais de semana.
+<p align="center">
+  <a href="dashbord/gifs/dashbord_deslocamento_tela2.gif">
+    <img src="dashbord/gifs/dashbord_deslocamento_tela2.gif" alt="Dashboard Power BI, página de deslocamento físico, com filtros por tipo de usuário e de bicicleta" width="85%">
+  </a>
+</p>
+<p align="center"><sub>Página 2: filtragem por tipo de usuário, tipo de bicicleta e estação.</sub></p>
 
----
+O modo Destino do mapa:
 
-## Utilização ao longo do dia
-
-**17h é o horário de maior utilização para ambos os grupos.**
-
-```text
-Members:  417.885 viagens
-Casuals:  197.592 viagens
-```
-
-A distribuição por período do dia apresenta:
-
-| Período   |   Members | Casuals |
-| --------- | --------: | ------: |
-| Tarde     | 1.643.820 | 941.247 |
-| Manhã     | 1.151.763 | 433.873 |
-| Noite     |   986.150 | 594.890 |
-| Madrugada |    88.910 | 110.824 |
-
-Os `members` apresentam maior volume durante a tarde e manhã, enquanto os `casuals` apresentam participação relativamente maior durante a tarde e noite.
-
-Esses padrões são compatíveis com diferentes formas de utilização, mas os dados de horário e dia da semana, isoladamente, não permitem determinar a finalidade das viagens.
+<p align="center">
+  <a href="dashbord/prints/Captura_de_tela_2026-10-13_095239.png">
+    <img src="dashbord/prints/Captura_de_tela_2026-10-13_095239.png" alt="Dashboard Power BI, perfil de deslocamento físico, com o mapa em modo Destino" width="100%">
+  </a>
+</p>
+<p align="center"><sub>Estações com mais viagens, modo Destino.</sub></p>
 
 ---
 
-## Duração das viagens
+## Conclusões gerais
 
-A duração média apresenta variações ao longo da semana.
+1. **O calendário de uso é diferente.** `member` usa o sistema principalmente em dias úteis, com pico na quarta-feira e picos pela manhã e às 17h. `casual` tem pico no sábado e maior participação nos fins de semana.
+2. **A duração das viagens diverge.** `casual` pedala por mais tempo, com maior variação entre dias e períodos. `member` concentra viagens curtas e com duração mais estável.
+3. **A bicicleta elétrica predomina nos dois grupos**, com participação um pouco maior entre `casual` (72,81%) do que entre `member` (67,39%).
+4. **A localização separa os grupos.** Navy Pier e DuSable Lake Shore Dr & Monroe St concentram `casual`; Canal St & Adams St, Dearborn Pkwy & Delaware Pl e a região de University Ave concentram `member`.
+5. **A finalidade das viagens não é observável.** Os dados descrevem quando, quanto tempo e onde cada grupo pedala. Os resultados são apresentados como padrões de uso, sem atribuir motivação às viagens.
 
-O sábado apresenta a maior média, com **16,90 minutos**, seguido pelo domingo, com **16,86 minutos**. A menor média ocorre na quarta-feira, com **12,68 minutos**.
+Síntese comparativa:
 
-Por hora, as maiores médias concentram-se principalmente entre **11h e 16h**, com o maior valor às **14h**, de **16,28 minutos**.
-
-Por período do dia:
-
-| Período   |     Média |   Mediana |
-| --------- | --------: | --------: |
-| Tarde     | 15,32 min | 10,14 min |
-| Noite     | 14,08 min |  9,69 min |
-| Madrugada | 13,90 min |  8,51 min |
-| Manhã     | 13,17 min |  8,52 min |
-
-### Duração por tipo de usuário
-
-Os `casuals` apresentam duração média superior aos `members` em todos os dias analisados.
-
-Entre os `casuals`:
-
-* maior média: **domingo — 21,22 min**;
-* menor média: **quarta-feira — 15,25 min**.
-
-Entre os `members`:
-
-* maior média: **sábado — 13,46 min**;
-* menor média: **quarta-feira — 11,69 min**.
-
-A variação entre os dias também é maior entre os `casuals`, enquanto os `members` apresentam durações mais próximas entre si.
-
-O mesmo padrão aparece na análise por período: os `casuals` apresentam maior duração média em todos os períodos, com destaque para a tarde, enquanto os `members` apresentam médias mais próximas entre os períodos.
+| Dimensão | Member | Casual |
+| --- | --- | --- |
+| Semana | Concentração em dias úteis (76,68%); pico na quarta-feira | Participação maior nos fins de semana (37,15%); pico no sábado |
+| Horário | Picos pela manhã e às 17h | Pico às 17h; mais viagens à noite e na madrugada em termos relativos |
+| Duração | Média menor e mais estável; 57,03% das viagens até 10 min | Média maior e mais variável; 55,72% das viagens acima de 10 min |
+| Bicicleta | 67,39% elétricas | 72,81% elétricas |
+| Estações | Canal St & Adams St, Dearborn Pkwy & Delaware Pl | Navy Pier, DuSable Lake Shore Dr & Monroe St |
 
 ---
 
-## Distribuição por faixa de duração
+## Limitações
 
-A maior parte das viagens concentra-se nas menores faixas de duração.
+- A imputação de estações usa a estação de referência mais próxima das coordenadas, sem distância máxima. As análises de estações e rotas incluem esses registros imputados.
+- Uma mesma estação pode ter várias coordenadas e, em poucos casos, mais de um ID. A coordenada de referência de cada ID é a mais frequente, não uma posição oficial.
+- O corte de 1 minuto e o de 24 horas são critérios operacionais definidos neste projeto. Foram removidas 158.876 viagens curtas, e viagens longas entre 32 min e 24 h foram mantidas.
+- Os resultados são descritivos. As diferenças entre os grupos não foram submetidas a testes estatísticos e não indicam causa.
 
-| Faixa           | Casuals | Members |
-| --------------- | ------: | ------: |
-| Até 10 min      |  44,28% |  57,03% |
-| 11–20 min       |  30,38% |  28,76% |
-| 21–30 min       |  11,72% |   8,77% |
-| 31–60 min       |   9,62% |   4,79% |
-| 61–120 min      |   3,17% |   0,47% |
-| Mais de 120 min |   0,83% |   0,19% |
+## Como executar
 
-Os dois grupos apresentam forte concentração em viagens curtas, mas essa concentração é maior entre os `members`: **57,03%** das viagens desse grupo possuem até 10 minutos, contra **44,28%** entre os `casuals`.
+Pré-requisitos: Python 3, PostgreSQL e Power BI Desktop.
 
-Também é possível observar uma redução progressiva da participação conforme a duração aumenta.
+1. Crie o ambiente virtual e instale as dependências:
 
----
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate        # Windows: .venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-## Análise das estações
+2. Baixe os 12 arquivos mensais, de `202509` a `202608`, da [fonte oficial](https://divvy-tripdata.s3.amazonaws.com/index.html) e extraia os CSVs em `data/raw/` (os arquivos originais compactados ficam em `data/raw_zip/`). Crie também `data/processed/`.
 
-A análise das estações mostrou diferenças claras na composição das principais estações de origem e destino.
+3. Crie o arquivo `.env` na raiz com as variáveis de conexão do PostgreSQL (sem versionar):
 
-### Principais estações de origem
+   ```text
+   DB_USER=
+   DB_PASSWORD=
+   DB_HOST=
+   DB_PORT=
+   DB_NAME=
+   ```
 
-Entre as estações com maior volume de viagens, algumas apresentam forte concentração de um dos grupos.
+4. Execute os notebooks em ordem, a partir da pasta `notebooks/`: `01_initial_exploration.ipynb` e `02_data_cleaning.ipynb`. O segundo gera o CSV tratado e carrega a tabela `trips`.
 
-A **Navy Pier**, por exemplo, registra **66.991 viagens de início**, sendo **75,93% de casuals** e **24,07% de members**.
+5. Execute os scripts SQL, começando por `sql/00_create_dim_calendar.sql`, e depois `01` a `06`:
 
-Em contraste, a **Canal St & Adams St** registra **61.279 viagens**, com **77,25% de members** e **22,75% de casuals**.
+   ```bash
+   psql -d <DB_NAME> -f sql/00_create_dim_calendar.sql
+   ```
 
-Outros exemplos:
+6. Abra `powerbi/cyclistic_dashboard.pbix` no Power BI Desktop.
 
-| Estação                           |  Total | Members | Casuals |
-| --------------------------------- | -----: | ------: | ------: |
-| Navy Pier                         | 66.991 |  24,07% |  75,93% |
-| Canal St & Adams St               | 61.279 |  77,25% |  22,75% |
-| DuSable Lake Shore Dr & Monroe St | 56.235 |  27,94% |  72,06% |
-| Dearborn Pkwy & Delaware Pl       | 55.111 |  70,65% |  29,35% |
-| Kingsbury St & Kinzie St 2        | 46.625 |  76,35% |  23,65% |
+## Autor
 
-As estações de destino apresentam composição semelhante. A **Navy Pier** também se destaca entre os destinos, com **66.720 viagens**, sendo **78,05% de casuals**.
+**Alessandro Moreira Cecilio**
 
-### Estação mais utilizada por dia e tipo de usuário
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AleCecilio)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/alessandro-cecilio/)
 
-A análise por dia da semana mostrou um padrão particularmente consistente:
-
-* a **Navy Pier** é a principal estação de início dos `casuals` em todos os dias da semana;
-* entre os `members`, a **Canal St & Adams St** ocupa a primeira posição de segunda a quinta-feira;
-* entre sexta-feira, sábado e domingo, a **Dearborn Pkwy & Delaware Pl** é a principal estação de início dos `members`.
-
-No sábado, a Navy Pier registra **13.299 viagens de início de casuals**, sendo o maior valor observado nessa análise.
-
-Esses resultados mostram que a concentração das viagens nas estações não ocorre de maneira uniforme entre os dois grupos.
-
-### Duração por estação
-
-Também foram analisadas as estações com maiores e menores durações médias, considerando apenas estações com pelo menos 100 viagens.
-
-Entre as maiores médias, destacam-se:
-
-| Estação                            | Viagens |     Média |   Mediana |
-| ---------------------------------- | ------: | --------: | --------: |
-| Cumberland Ave & Catherine Ave     |     152 | 65,18 min | 34,28 min |
-| Burnham Greenway & 112th St        |     150 | 43,94 min | 38,35 min |
-| Mason Ave & Montrose Ave           |     262 | 41,57 min | 16,51 min |
-| Public Rack - Justine St & 87th St |     172 | 41,36 min | 29,88 min |
-| Karlov Ave & Madison St            |     121 | 41,29 min | 21,90 min |
-
-Entre as menores médias:
-
-| Estação                              | Viagens |    Média |  Mediana |
-| ------------------------------------ | ------: | -------: | -------: |
-| Public Rack - Pulaski Rd & 44th St   |     120 | 4,26 min | 3,02 min |
-| Public Rack - Foster Ave & Drake Ave |     204 | 6,84 min | 2,86 min |
-| University Ave & 65th St             |   3.504 | 7,64 min | 4,74 min |
-| Public Rack - Lighthouse Beach       |   3.697 | 7,95 min | 5,90 min |
-| University Ave & 57th St             |  37.499 | 8,01 min | 4,70 min |
-
-A diferença entre média e mediana em algumas estações também indica a presença de distribuições assimétricas. Por exemplo, **Mason Ave & Montrose Ave** apresenta média de 41,57 minutos e mediana de 16,51 minutos.
-
-Esses resultados descrevem diferenças de duração associadas às estações de início, mas não permitem afirmar que a estação seja a causa dessas diferenças.
-
-### Rotas mais utilizadas
-
-A análise das combinações entre estação de origem e destino revelou padrões diferentes entre os grupos.
-
-Entre os `casuals`, aparecem com destaque diversas rotas envolvendo a **Navy Pier** e a **DuSable Lake Shore Dr & Monroe St**, além de várias viagens em que a estação de origem e destino é a mesma.
-
-As principais rotas incluem:
-
-* Navy Pier → Navy Pier: **9.482 viagens**;
-* DuSable Lake Shore Dr & Monroe St → mesma estação: **8.148**;
-* DuSable Lake Shore Dr & Monroe St → Navy Pier: **5.212**;
-* Michigan Ave & Oak St → mesma estação: **3.509**.
-
-Entre os `members`, as principais rotas apresentam maior presença de deslocamentos entre estações distintas, especialmente na região de **University Ave, Blackstone Ave e Ellis Ave**.
-
-Entre elas:
-
-* Blackstone Ave & 59th St → University Ave & 57th St: **3.421 viagens**;
-* University Ave & 57th St → mesma estação: **3.362**;
-* University Ave & 57th St → Blackstone Ave & 59th St: **3.232**;
-* Ellis Ave & 60th St → University Ave & 57th St: **3.194**.
-
-As viagens com a mesma estação de origem e destino aparecem nos dois grupos. Esse padrão pode ser descrito como uma característica das rotas observadas, mas não permite determinar, isoladamente, a finalidade da viagem.
-
----
-
-## Interpretação Final
-
-A análise dos 12 meses de dados apresenta diferenças consistentes entre `members` e `casuals` em diversas dimensões.
-
-Os principais padrões identificados foram:
-
-* `members` apresentam maior concentração de viagens nos dias úteis;
-* `casuals` possuem participação relativamente maior nos finais de semana;
-* sábado é o dia com maior participação geral das viagens;
-* 17h é o horário de maior utilização para ambos os grupos;
-* bicicletas elétricas apresentam maior volume de utilização do que bicicletas clássicas nos dois grupos;
-* `casuals` apresentam maior duração média das viagens em todos os dias e períodos analisados;
-* `members` apresentam maior concentração de viagens de até 10 minutos;
-* a duração das viagens apresenta maior variação entre os `casuals`;
-* algumas estações apresentam forte concentração de `casuals`, enquanto outras são predominantemente utilizadas por `members`;
-* a Navy Pier se destaca entre as estações utilizadas por `casuals`;
-* Canal St & Adams St e Dearborn Pkwy & Delaware Pl apresentam forte presença de `members`;
-* as principais rotas diferem entre os grupos, com maior presença de determinadas regiões e combinações de estações para cada perfil.
-
-Em conjunto, esses resultados mostram que os dois grupos apresentam **padrões de utilização distintos em relação ao momento, duração, tipo de bicicleta, localização e combinação entre estações**.
-
-Ao mesmo tempo, os dados analisados não permitem determinar isoladamente a finalidade de cada viagem. Dessa forma, as conclusões são apresentadas como padrões observados no comportamento de utilização, evitando atribuir uma finalidade específica às viagens sem evidências adicionais.
-
----
-
-## Próximas Etapas
-
-A etapa de análise exploratória e analítica com SQL foi concluída.
-
-### Concluído
-
-* [x] Download e organização dos dados;
-* [x] Exploração inicial;
-* [x] Consolidação dos arquivos mensais;
-* [x] Inspeção com Sweetviz;
-* [x] Tratamento de valores ausentes;
-* [x] Tratamento de duplicidades;
-* [x] Padronização dos dados;
-* [x] Tratamento de inconsistências temporais;
-* [x] Criação das variáveis derivadas;
-* [x] Tratamento da duração das viagens;
-* [x] Validação do dataset;
-* [x] Carregamento no PostgreSQL;
-* [x] Análise do perfil dos usuários;
-* [x] Análise semanal;
-* [x] Análise horária;
-* [x] Análise da duração das viagens;
-* [x] Análise das estações;
-* [x] Análise das principais rotas;
-* [x] Consolidação dos principais insights.
-
-### Próximas etapas
-
-* [ ] Desenvolvimento do dashboard no Power BI;
-* [ ] Revisão final da documentação;
-* [ ] Publicação e apresentação dos resultados.
-
----
-
-## Ferramentas
-
-* **Python** — processamento e preparação dos dados;
-* **Pandas** — manipulação e transformação;
-* **NumPy** — operações numéricas;
-* **Matplotlib / Seaborn** — visualização;
-* **Sweetviz** — exploração automatizada;
-* **Jupyter Notebook** — exploração e documentação;
-* **PostgreSQL** — armazenamento e análise;
-* **SQL** — análise dos dados;
-* **Power BI** — visualização dos resultados;
-* **Git / GitHub** — versionamento.
-
----
-
-## Fonte dos Dados
-
-**Divvy — Bike Share Trip Data**
-
-Dados históricos de viagens disponibilizados publicamente pela Divvy:
-
-[Divvy Trip Data](https://divvy-tripdata.s3.amazonaws.com/index.html)
+*Projeto desenvolvido para portfólio em Análise e Ciência de Dados.*
